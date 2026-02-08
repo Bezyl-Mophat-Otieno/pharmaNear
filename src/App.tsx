@@ -53,16 +53,17 @@ function AppContent() {
   const isAdmin = [RoleEnum.TENANT, RoleEnum.ADMIN].includes(user?.role);
 
   // Show public layout only for non-admin routes or non-admin users
-  const showPublicLayout = !isAdminRoute || !isAdmin;
+  const showPublicLayout = !isAdminRoute || !isAdmin
+  const isLandinpage = location.pathname === '/';
 
   return (
     <div className="min-h-screen flex flex-col">
-      {showPublicLayout && <Navbar />}
+      {(showPublicLayout && !isLandinpage) && <Navbar />}
       <main className="flex-1">
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<Index />} />
-          <Route path="/guest" element={<Guest />} />
+          <Route path="/" element={<Guest />} />
+          <Route path="/tenant/home" element={<Index />} />
           <Route path="/tenant/onboard" element={<TenantOnboarding />} />
           <Route path="/products" element={<Products />} />
           <Route path="/product/:id" element={<ProductDetail />} />
