@@ -3,11 +3,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { RoleEnum } from '@/types';
 
-interface TenantuthGuardProps {
+interface SelleruthGuardProps {
   children: React.ReactNode;
 }
 
-export function TenantAuthGuard({ children }: TenantuthGuardProps) {
+export function SellerAuthGuard({ children }: SelleruthGuardProps) {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -15,10 +15,10 @@ export function TenantAuthGuard({ children }: TenantuthGuardProps) {
   useEffect(() => {
     if (!loading) {
       if (!user) {
-        // Redirect to tenant login if not authenticated
-        navigate('/tenant/login', { replace: true });
-      } else if (![RoleEnum.TENANT, RoleEnum.ADMIN].includes(user.role)) {
-        // Redirect to home if user is not tenant
+        // Redirect to seller login if not authenticated
+        navigate('/seller/login', { replace: true });
+      } else if (![RoleEnum.SELLER, RoleEnum.ADMIN].includes(user.role)) {
+        // Redirect to home if user is not seller
         navigate('/', { replace: true });
       }
     }
@@ -32,7 +32,7 @@ export function TenantAuthGuard({ children }: TenantuthGuardProps) {
     );
   }
 
-  if (!user || ![RoleEnum.TENANT, RoleEnum.ADMIN].includes(user.role)) {
+  if (!user || ![RoleEnum.SELLER, RoleEnum.ADMIN].includes(user.role)) {
     return null;
   }
 

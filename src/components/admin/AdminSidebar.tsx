@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button"
 
 const adminMenuItems = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
-  { title: "Business Management", url: "/admin/businesses", icon: Building2 },
+  { title: "Business Management", url: "/admin/sellers", icon: Building2 },
   { title: "Profile", url: "/admin/profile", icon: Settings },
 ]
 

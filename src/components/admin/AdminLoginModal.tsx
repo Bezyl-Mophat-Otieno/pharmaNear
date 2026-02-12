@@ -45,8 +45,8 @@ export function AdminLoginModal({ open, onOpenChange }: AdminLoginModalProps) {
         })
       }
       onOpenChange(false)
-      if (loggedInUser?.role === 'tenant') {
-        navigate('/tenant', { replace: true })
+      if (loggedInUser?.role === 'seller') {
+        navigate('/seller', { replace: true })
         return
       }
       navigate('/admin', { replace: true })

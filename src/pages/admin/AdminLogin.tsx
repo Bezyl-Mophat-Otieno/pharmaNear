@@ -40,8 +40,8 @@ export default function AdminLogin() {
           description: response.message,
         })
       }
-      if (loggedInUser?.role === 'tenant') {
-        navigate('/tenant', { replace: true })
+      if (loggedInUser?.role === 'seller') {
+        navigate('/seller', { replace: true })
         return;
       }
       navigate('/admin', { replace: true })

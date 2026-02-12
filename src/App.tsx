@@ -26,20 +26,21 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminProfile from "./pages/admin/AdminProfile";
 import { AdminLayout } from "./components/admin/AdminLayout";
 
-import CategoryManagement from "./pages/tenant/CategoryManagement";
-import OrderManagement from "./pages/tenant/OrderManagement";
-import TransactionManagement from "./pages/tenant/TransactionManagement";
-import ProductManagement from "./pages/tenant/ProductManagement";
-import StockManagement from "./pages/tenant/StockManagement";
+import CategoryManagement from "./pages/seller/CategoryManagement";
+import OrderManagement from "./pages/seller/OrderManagement";
+import TransactionManagement from "./pages/seller/TransactionManagement";
+import ProductManagement from "./pages/seller/ProductManagement";
+import StockManagement from "./pages/seller/StockManagement";
 
 import ScrollToTop from "@/components/ScrollToTop.ts";
 import { RoleEnum } from "./types";
-import TenantOnboarding from "./pages/tenant/TenantOnboarding";
 import BusinessManagement from "./pages/admin/BusinessManagement";
-import TenantLogin from "./pages/tenant/TenantLogin";
-import TenantDashboard from "./pages/tenant/TenantDashboard";
-import TenantProfile from "./pages/tenant/TenantProfile";
-import { TenantLayout } from "./components/tenant/TenantLayout";
+import SellerLogin from "./pages/seller/SellerLogin";
+import SellerProfile from "./pages/seller/SellerProfile";
+import { SellerLayout } from "./components/seller/SellerLayout";
+import SellerDashboard from "./pages/seller/SellerDashboard";
+import SellerOnboarding from "./pages/seller/SellerOnboarding";
+
 
 const queryClient = new QueryClient();
 
@@ -48,9 +49,9 @@ function AppContent() {
   const { user } = useAuth();
 
   // Check if current route is an admin route or a tenent route
-  const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/tenant');
+  const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/seller');
   // Check if user is admin
-  const isAdmin = [RoleEnum.TENANT, RoleEnum.ADMIN].includes(user?.role);
+  const isAdmin = [RoleEnum.SELLER, RoleEnum.ADMIN].includes(user?.role);
 
   // Show public layout only for non-admin routes or non-admin users
   const showPublicLayout = !isAdminRoute || !isAdmin
@@ -63,8 +64,8 @@ function AppContent() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Guest />} />
-          <Route path="/tenant/home" element={<Index />} />
-          <Route path="/tenant/onboard" element={<TenantOnboarding />} />
+          <Route path="/seller/home" element={<Index />} />
+          <Route path="/seller/onboard" element={<SellerOnboarding />} />
           <Route path="/products" element={<Products />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/about" element={<About />} />
@@ -80,7 +81,7 @@ function AppContent() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={
             <AdminLayout>
-              <TenantDashboard />
+              <SellerDashboard />
             </AdminLayout>
           } />
           <Route path="/admin/business-management" element={
@@ -93,47 +94,47 @@ function AppContent() {
               <AdminProfile />
             </AdminLayout>
           } />
-          {/* Tenant Routes */}
-          <Route path="/tenant/login" element={<TenantLogin />} />
-          <Route path="/tenant" element={
-            <TenantLayout>
-              <TenantDashboard />
-            </TenantLayout>
+          {/* seller Routes */}
+          <Route path="/seller/login" element={<SellerLogin />} />
+          <Route path="/seller" element={
+            <SellerLayout>
+              <SellerDashboard />
+            </SellerLayout>
           } />
-          <Route path="/tenant/businesses" element={
-            <TenantLayout>
+          <Route path="/seller/sellers" element={
+            <SellerLayout>
               <BusinessManagement />
-            </TenantLayout>
+            </SellerLayout>
           } />
-          <Route path="/tenant/profile" element={
-            <TenantLayout>
-              <TenantProfile />
-            </TenantLayout>
+          <Route path="/seller/profile" element={
+            <SellerLayout>
+              <SellerProfile />
+            </SellerLayout>
           } />
-          <Route path="/tenant/products" element={
-            <TenantLayout>
+          <Route path="/seller/products" element={
+            <SellerLayout>
               <ProductManagement />
-            </TenantLayout>
+            </SellerLayout>
           } />
-          <Route path="/tenant/categories" element={
-            <TenantLayout>
+          <Route path="/seller/categories" element={
+            <SellerLayout>
               <CategoryManagement />
-            </TenantLayout>
+            </SellerLayout>
           } />
-          <Route path="/tenant/orders" element={
-            <TenantLayout>
+          <Route path="/seller/orders" element={
+            <SellerLayout>
               <OrderManagement />
-            </TenantLayout>
+            </SellerLayout>
           } />
-          <Route path="/tenant/stock" element={
-            <TenantLayout>
+          <Route path="/seller/stock" element={
+            <SellerLayout>
               <StockManagement />
-            </TenantLayout>
+            </SellerLayout>
           } />
-          <Route path="/tenant/transactions" element={
-            <TenantLayout>
+          <Route path="/seller/transactions" element={
+            <SellerLayout>
               <TransactionManagement />
-            </TenantLayout>
+            </SellerLayout>
           } />
           <Route path="*" element={<NotFound />} />
         </Routes>

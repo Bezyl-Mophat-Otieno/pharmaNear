@@ -7,35 +7,35 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Business } from '@/services/businessService';
 import { MapPin, Mail, User, FileText, ExternalLink, Calendar, Building2 } from 'lucide-react';
+import { Seller } from '@/services/sellerService';
 
-interface BusinessDetailModalProps {
-    business: Business;
+interface SellerDetailModalProps {
+    seller: Seller;
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onEdit: (business: Business) => void;
+    onEdit: (seller: Seller) => void;
     onApprove: () => void;
     onReject: () => void;
 }
 
-export function BusinessDetailModal({
-    business,
+export function SellerDetailModal({
+    seller,
     open,
     onOpenChange,
     onEdit,
     onApprove,
     onReject,
-}: BusinessDetailModalProps) {
+}: SellerDetailModalProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({
-        businessName: business.businessName,
-        businessType: business.businessType || '',
-        address: business.address,
+        businessName: seller.businessName,
+        businessType: seller.businessType || '',
+        address: seller.address,
     });
 
     const handleSave = () => {
-        onEdit({ ...business, ...editData });
+        onEdit({ ...seller, ...editData });
         setIsEditing(false);
     };
 
@@ -55,9 +55,9 @@ export function BusinessDetailModal({
                     <div className="flex items-center justify-between">
                         <DialogTitle className="flex items-center gap-2">
                             <Building2 className="h-5 w-5" />
-                            {business.businessName}
+                            {seller.businessName}
                         </DialogTitle>
-                        {getStatusBadge(business.status)}
+                        {getStatusBadge(seller.status)}
                     </div>
                 </DialogHeader>
 
@@ -105,15 +105,15 @@ export function BusinessDetailModal({
                                             <Building2 className="h-4 w-4 mt-1 text-muted-foreground" />
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Business Name</p>
-                                                <p className="font-medium">{business.businessName}</p>
+                                                <p className="font-medium">{seller.businessName}</p>
                                             </div>
                                         </div>
-                                        {business.businessType && (
+                                        {seller.businessType && (
                                             <div className="flex items-start gap-3">
                                                 <FileText className="h-4 w-4 mt-1 text-muted-foreground" />
                                                 <div>
                                                     <p className="text-sm text-muted-foreground">Business Type</p>
-                                                    <p className="font-medium">{business.businessType}</p>
+                                                    <p className="font-medium">{seller.businessType}</p>
                                                 </div>
                                             </div>
                                         )}
@@ -121,10 +121,10 @@ export function BusinessDetailModal({
                                             <MapPin className="h-4 w-4 mt-1 text-muted-foreground" />
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Location</p>
-                                                <p className="font-medium">{business.address}</p>
-                                                {business.latitude && business.longitude && (
+                                                <p className="font-medium">{seller.address}</p>
+                                                {seller.latitude && seller.longitude && (
                                                     <p className="text-xs text-muted-foreground mt-1">
-                                                        Coordinates: {business.latitude.toFixed(6)}, {business.longitude.toFixed(6)}
+                                                        Coordinates: {seller.latitude.toFixed(6)}, {seller.longitude.toFixed(6)}
                                                     </p>
                                                 )}
                                             </div>
@@ -133,7 +133,7 @@ export function BusinessDetailModal({
                                             <Calendar className="h-4 w-4 mt-1 text-muted-foreground" />
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Registered</p>
-                                                <p className="font-medium">{new Date(business.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                                <p className="font-medium">{new Date(seller.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                                             </div>
                                         </div>
                                     </CardContent>
@@ -144,11 +144,11 @@ export function BusinessDetailModal({
                     </TabsContent>
 
                     <TabsContent value="documents" className="space-y-4 mt-4">
-                        {business.documents.length === 0 ? (
+                        {seller.documents.length === 0 ? (
                             <p className="text-muted-foreground text-center py-8">No documents uploaded</p>
                         ) : (
                             <div className="space-y-3">
-                                {business.documents.map((doc) => (
+                                {seller.documents.map((doc) => (
                                     <Card key={doc.id}>
                                         <CardContent className="flex items-center justify-between py-4">
                                             <div className="flex items-center gap-3">
@@ -180,14 +180,14 @@ export function BusinessDetailModal({
                                     <User className="h-4 w-4 mt-1 text-muted-foreground" />
                                     <div>
                                         <p className="text-sm text-muted-foreground">Owner Name</p>
-                                        <p className="font-medium">{business.owner.name}</p>
+                                        <p className="font-medium">{seller.owner.name}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3">
                                     <Mail className="h-4 w-4 mt-1 text-muted-foreground" />
                                     <div>
                                         <p className="text-sm text-muted-foreground">Email</p>
-                                        <p className="font-medium">{business.owner.email}</p>
+                                        <p className="font-medium">{seller.owner.email}</p>
                                     </div>
                                 </div>
                             </CardContent>
@@ -195,18 +195,18 @@ export function BusinessDetailModal({
                     </TabsContent>
                 </Tabs>
 
-                {business.rejectionReason && (
+                {seller.rejectionReason && (
                     <>
                         <Separator />
                         <div className="rounded-md bg-destructive/10 p-4">
                             <p className="text-sm font-medium text-destructive">Rejection Reason</p>
-                            <p className="text-sm mt-1">{business.rejectionReason}</p>
+                            <p className="text-sm mt-1">{seller.rejectionReason}</p>
                         </div>
                     </>
                 )}
 
                 <DialogFooter className="gap-2">
-                    {business.status === 'pending' && (
+                    {seller.status === 'pending' && (
                         <>
                             <Button variant="destructive" onClick={onReject}>Reject</Button>
                             <Button onClick={onApprove}>Approve</Button>

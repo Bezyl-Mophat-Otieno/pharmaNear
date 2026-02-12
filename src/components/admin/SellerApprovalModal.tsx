@@ -3,27 +3,27 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Business } from '@/services/businessService';
+import { Seller } from '@/services/sellerService';
 import { CheckCircle2, FileText, ShieldCheck } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
-interface BusinessApprovalModalProps {
-    business: Business;
+interface SellerApprovalModalProps {
+    seller: Seller;
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onConfirm: (documentIds: string[]) => Promise<void>;
 }
 
-export function BusinessApprovalModal({
-    business,
+export function SellerApprovalModal({
+    seller,
     open,
     onOpenChange,
     onConfirm,
-}: BusinessApprovalModalProps) {
+}: SellerApprovalModalProps) {
     const [checkedDocs, setCheckedDocs] = useState<Set<string>>(new Set());
     const [submitting, setSubmitting] = useState(false);
 
-    const allChecked = business.documents.length > 0 && checkedDocs.size === business.documents.length;
+    const allChecked = seller.documents.length > 0 && checkedDocs.size === seller.documents.length;
 
     const toggleDoc = (docId: string) => {
         setCheckedDocs(prev => {
@@ -53,17 +53,17 @@ export function BusinessApprovalModal({
                         Approve Business
                     </DialogTitle>
                     <DialogDescription>
-                        Please confirm that you have reviewed all submitted documents for <strong>{business.businessName}</strong> before approving.
+                        Please confirm that you have reviewed all submitted documents for <strong>{seller.businessName}</strong> before approving.
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-4 py-4">
                     <p className="text-sm font-medium">Review & confirm each document:</p>
-                    {business.documents.length === 0 ? (
+                    {seller.documents.length === 0 ? (
                         <p className="text-sm text-muted-foreground py-4 text-center">No documents submitted</p>
                     ) : (
                         <div className="space-y-3">
-                            {business.documents.map((doc) => (
+                            {seller.documents.map((doc) => (
                                 <label
                                     key={doc.id}
                                     className="flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors"

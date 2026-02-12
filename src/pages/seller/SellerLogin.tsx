@@ -19,9 +19,9 @@ export default function AdminLogin() {
     const navigate = useNavigate()
 
     useEffect(() => {
-        // Redirect if already logged in as tenant
-        if (!loading && user?.role === 'tenant') {
-            navigate('/tenant', { replace: true })
+        // Redirect if already logged in as seller
+        if (!loading && user?.role === 'seller') {
+            navigate('/seller', { replace: true })
         }
     }, [user, loading, navigate])
 
@@ -40,8 +40,8 @@ export default function AdminLogin() {
                     description: response.message,
                 })
             }
-            if (loggedInUser?.role === 'tenant') {
-                navigate('/tenant', { replace: true })
+            if (loggedInUser?.role === 'seller') {
+                navigate('/seller', { replace: true })
                 return;
             }
             navigate('/admin', { replace: true })

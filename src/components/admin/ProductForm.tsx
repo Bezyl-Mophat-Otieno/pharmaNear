@@ -27,8 +27,8 @@ import { Badge } from '@/components/ui/badge';
 import { Product, productStatus } from '@/types/product';
 import { useToast } from '@/hooks/use-toast';
 import { Subcategory, Category } from '@/services/categoryService';
-import { uploadService } from '@/services/uploadService';
 import { ApiResponse, UploadedItem } from '@/types'
+import { productService } from '@/services/productService';
 
 const productSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
@@ -183,7 +183,7 @@ const ProductForm = ({ product, onSave, onCancel, categories, processingProduct 
       for (const file of imageFiles) {
         const formData = new FormData();
         formData.append('file', file);
-        const response = await uploadService.upload(formData);
+        const response = await productService.uploadImage(formData);
         uploadedImages.push(response);
         await new Promise(resolve => setTimeout(resolve, 500));
       }

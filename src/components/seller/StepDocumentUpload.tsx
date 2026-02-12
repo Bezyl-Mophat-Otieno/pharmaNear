@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { ArrowLeft, ArrowRight, FileText, Upload, CheckCircle2, Loader2, Info } from 'lucide-react';
 import { sellerService } from '@/services/sellerService';
 import { useToast } from '@/hooks/use-toast';
-import { OnboardingData } from '@/pages/tenant/TenantOnboarding';
+import { OnboardingData } from '@/pages/seller/SellerOnboarding';
 interface Props {
     data: OnboardingData;
     updateData: (d: Partial<OnboardingData>) => void;
@@ -20,17 +20,17 @@ const StepDocumentUpload = ({ data, updateData, onNext, onBack }: Props) => {
     const [uploadingPermit, setUploadingPermit] = useState(false);
     const handleUpload = async (
         file: File,
-        type: 'ppb' | 'permit'
+        type: 'ppb_license' | 'business_permit'
     ) => {
-        const setLoading = type === 'ppb' ? setUploadingPpb : setUploadingPermit;
+        const setLoading = type === 'ppb_license' ? setUploadingPpb : setUploadingPermit;
         setLoading(true);
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const res = await sellerService.uploadDocument(formData);
+            const res = await sellerService.uploadDocument(formData, type, data.userId);
             const resData = res.data as any;
             if (res.success && resData?.url) {
-                if (type === 'ppb') {
+                if (type === 'ppb_license') {
                     updateData({ ppbLicenseUrl: resData.url, ppbLicenseName: file.name });
                 } else {
                     updateData({ businessPermitUrl: resData.url, businessPermitName: file.name });
@@ -43,7 +43,7 @@ const StepDocumentUpload = ({ data, updateData, onNext, onBack }: Props) => {
             setLoading(false);
         }
     };
-    const onFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'ppb' | 'permit') => {
+    const onFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'ppb_license' | 'business_permit') => {
         const file = e.target.files?.[0];
         if (file) handleUpload(file, type);
     };
@@ -62,7 +62,7 @@ const StepDocumentUpload = ({ data, updateData, onNext, onBack }: Props) => {
                 {/* PPB License */}
                 <div className="space-y-2">
                     <Label>PPB License (Pharmacy and Poisons Board)</Label>
-                    <input ref={ppbRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={e => onFileChange(e, 'ppb')} />
+                    <input ref={ppbRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={e => onFileChange(e, 'ppb_license')} />
                     {data.ppbLicenseUrl ? (
                         <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
                             <CheckCircle2 className="h-4 w-4 text-primary" />
@@ -90,7 +90,7 @@ const StepDocumentUpload = ({ data, updateData, onNext, onBack }: Props) => {
                 {/* Business Permit */}
                 <div className="space-y-2">
                     <Label>Business Permit</Label>
-                    <input ref={permitRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={e => onFileChange(e, 'permit')} />
+                    <input ref={permitRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={e => onFileChange(e, 'business_permit')} />
                     {data.businessPermitUrl ? (
                         <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
                             <CheckCircle2 className="h-4 w-4 text-primary" />

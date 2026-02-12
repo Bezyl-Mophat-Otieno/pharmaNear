@@ -42,7 +42,7 @@ const SellerCallout = () => {
                             <Button
                                 size="lg"
                                 className="shrink-0 rounded-full px-6"
-                                onClick={() => navigate('/tenant/onboard')}
+                                onClick={() => navigate('/seller/onboard')}
                             >
                                 Start Selling
                                 <ArrowRight className="ml-2 h-4 w-4" />

@@ -6,24 +6,24 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { useAdminBusinesses } from '@/hooks/useAdminBusinesses';
-import { Business, BusinessStatus } from '@/services/businessService';
-import { BusinessDetailModal } from '@/components/admin/BusinessDetailModal';
-import { BusinessApprovalModal } from '@/components/admin/BusinessApprovalModal';
-import { BusinessRejectionModal } from '@/components/admin/BusinessRejectionModal';
-import { BusinessDeleteModal } from '@/components/admin/BusinessDeleteModal';
+import { SellerDetailModal } from '@/components/admin/Seller';
+import { SellerApprovalModal } from '@/components/admin/SellerApprovalModal';
+import { SellerRejectionModal } from '@/components/admin/SellerRejectionModal';
+import { SellerDeleteModal } from '@/components/admin/SellerDeleteModal';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import {
     Search, Eye, Trash2, CheckCircle, XCircle,
     Building2, Clock, ShieldCheck, ShieldX,
 } from 'lucide-react';
+import { useAdminsellers } from '@/hooks/useAdminSellers';
+import { Seller, SellerStatus } from '@/services/sellerService';
 const BusinessManagement = () => {
     const { toast } = useToast();
     const {
-        businesses, stats, loading, error, filters, setFilters,
-        refetch, updateBusiness, deleteBusiness, approveBusiness, rejectBusiness,
-    } = useAdminBusinesses();
-    const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
+        sellers, stats, loading, error, filters, setFilters,
+        refetch, updateSeller, deleteSeller, approveSeller, rejectSeller,
+    } = useAdminsellers();
+    const [selectedBusiness, setSelectedBusiness] = useState<Seller | null>(null);
     const [detailOpen, setDetailOpen] = useState(false);
     const [approvalOpen, setApprovalOpen] = useState(false);
     const [rejectionOpen, setRejectionOpen] = useState(false);
@@ -31,7 +31,7 @@ const BusinessManagement = () => {
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     // Local filtering on top of server-side filters
-    const filtered = businesses.filter(b => {
+    const filtered = sellers.filter(b => {
         if (!searchTerm) return true;
         const q = searchTerm.toLowerCase();
         return (
@@ -43,15 +43,15 @@ const BusinessManagement = () => {
     const handleStatusFilter = (status: string) => {
         setFilters(prev => ({
             ...prev,
-            status: status === 'all' ? undefined : status as BusinessStatus,
+            status: status === 'all' ? undefined : status as SellerStatus,
         }));
     };
-    const handleStatClick = (status?: BusinessStatus) => {
+    const handleStatClick = (status?: SellerStatus) => {
         setFilters(prev => ({ ...prev, status }));
     };
-    const handleEdit = async (business: Business) => {
+    const handleEdit = async (business: Seller) => {
         try {
-            await updateBusiness(business.id, {
+            await updateSeller(business.id, {
                 businessName: business.businessName,
                 businessType: business.businessType,
                 address: business.address,
@@ -65,7 +65,7 @@ const BusinessManagement = () => {
     const handleApprove = async (documentIds: string[]) => {
         if (!selectedBusiness) return;
         try {
-            await approveBusiness(selectedBusiness.id, documentIds);
+            await approveSeller(selectedBusiness.id, documentIds);
             toast({ title: 'Business Approved', description: `${selectedBusiness.businessName} has been approved.` });
             setApprovalOpen(false);
             setDetailOpen(false);
@@ -76,7 +76,7 @@ const BusinessManagement = () => {
     const handleReject = async (reason: string, rejectedDocumentIds: string[]) => {
         if (!selectedBusiness) return;
         try {
-            await rejectBusiness(selectedBusiness.id, reason, rejectedDocumentIds);
+            await rejectSeller(selectedBusiness.id, reason, rejectedDocumentIds);
             toast({ title: 'Business Rejected', description: `${selectedBusiness.businessName} has been rejected. Owner will be notified.` });
             setRejectionOpen(false);
             setDetailOpen(false);
@@ -88,7 +88,7 @@ const BusinessManagement = () => {
         if (!selectedBusiness) return;
         setDeleteLoading(true);
         try {
-            await deleteBusiness(selectedBusiness.id);
+            await deleteSeller(selectedBusiness.id);
             toast({ title: 'Business Deleted', description: `${selectedBusiness.businessName} has been removed.` });
             setDeleteOpen(false);
             setSelectedBusiness(null);
@@ -98,7 +98,7 @@ const BusinessManagement = () => {
             setDeleteLoading(false);
         }
     };
-    const getStatusBadge = (status: BusinessStatus) => {
+    const getStatusBadge = (status: SellerStatus) => {
         const variants: Record<string, string> = {
             approved: 'bg-green-100 text-green-800 border-green-300',
             pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
@@ -111,10 +111,10 @@ const BusinessManagement = () => {
             <div className="space-y-6">
                 <div>
                     <h1 className="text-3xl font-bold">Business Management</h1>
-                    <p className="text-muted-foreground">Monitor and manage registered businesses</p>
+                    <p className="text-muted-foreground">Monitor and manage registered sellers</p>
                 </div>
                 <div className="h-96 flex items-center justify-center">
-                    <LoadingSpinner size="lg" text="Loading businesses..." />
+                    <LoadingSpinner size="lg" text="Loading sellers..." />
                 </div>
             </div>
         );
@@ -124,7 +124,7 @@ const BusinessManagement = () => {
             <div className="space-y-6">
                 <div>
                     <h1 className="text-3xl font-bold">Business Management</h1>
-                    <p className="text-muted-foreground">Monitor and manage registered businesses</p>
+                    <p className="text-muted-foreground">Monitor and manage registered sellers</p>
                 </div>
                 <div className="text-center py-12">
                     <p className="text-destructive">{error}</p>
@@ -137,7 +137,7 @@ const BusinessManagement = () => {
         <div className="space-y-6">
             <div>
                 <h1 className="text-3xl font-bold">Business Management</h1>
-                <p className="text-muted-foreground">Monitor and manage registered businesses</p>
+                <p className="text-muted-foreground">Monitor and manage registered sellers</p>
             </div>
             {/* Statistics Cards */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -146,7 +146,7 @@ const BusinessManagement = () => {
                     onClick={() => handleStatClick(undefined)}
                 >
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Businesses</CardTitle>
+                        <CardTitle className="text-sm font-medium">Total sellers</CardTitle>
                         <Building2 className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
@@ -226,7 +226,7 @@ const BusinessManagement = () => {
             {/* Business Table */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Businesses ({filtered.length})</CardTitle>
+                    <CardTitle>sellers ({filtered.length})</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -244,7 +244,7 @@ const BusinessManagement = () => {
                             {filtered.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                                        No businesses found
+                                        No sellers found
                                     </TableCell>
                                 </TableRow>
                             ) : (
@@ -292,27 +292,27 @@ const BusinessManagement = () => {
             {/* Modals */}
             {selectedBusiness && (
                 <>
-                    <BusinessDetailModal
-                        business={selectedBusiness}
+                    <SellerDetailModal
+                        seller={selectedBusiness}
                         open={detailOpen}
                         onOpenChange={setDetailOpen}
                         onEdit={handleEdit}
                         onApprove={() => { setDetailOpen(false); setApprovalOpen(true); }}
                         onReject={() => { setDetailOpen(false); setRejectionOpen(true); }}
                     />
-                    <BusinessApprovalModal
-                        business={selectedBusiness}
+                    <SellerApprovalModal
+                        seller={selectedBusiness}
                         open={approvalOpen}
                         onOpenChange={setApprovalOpen}
                         onConfirm={handleApprove}
                     />
-                    <BusinessRejectionModal
-                        business={selectedBusiness}
+                    <SellerRejectionModal
+                        seller={selectedBusiness}
                         open={rejectionOpen}
                         onOpenChange={setRejectionOpen}
                         onConfirm={handleReject}
                     />
-                    <BusinessDeleteModal
+                    <SellerDeleteModal
                         businessName={selectedBusiness.businessName}
                         open={deleteOpen}
                         onOpenChange={setDeleteOpen}
