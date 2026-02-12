@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Send, Loader2, User, Building2, FileText, CheckCircle2 } from 'lucide-react';
 import { sellerService } from '@/services/sellerService';
 import { useToast } from '@/hooks/use-toast';
-import { OnboardingData } from '@/pages/tenant/TenantOnboarding';
+import { OnboardingData } from '@/pages/seller/SellerOnboarding';
 interface Props {
     data: OnboardingData;
     onBack: () => void;
@@ -29,7 +29,7 @@ const StepReviewSubmit = ({ data, onBack, onSubmit }: Props) => {
         try {
             const res = await sellerService.submitOnboarding({
                 userId: data.userId || '',
-                business: {
+                seller: {
                     businessName: data.businessName,
                     businessType: data.businessType,
                     address: data.address,

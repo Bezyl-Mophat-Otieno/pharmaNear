@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { ArrowRight, User, Mail, Lock, Loader2 } from 'lucide-react';
 import { sellerService } from '@/services/sellerService';
 import { useToast } from '@/hooks/use-toast';
-import { OnboardingData } from '@/pages/tenant/TenantOnboarding';
+import { OnboardingData } from '@/pages/seller/SellerOnboarding';
 interface Props {
     data: OnboardingData;
     updateData: (d: Partial<OnboardingData>) => void;
@@ -40,7 +40,7 @@ const StepAccountCreation = ({ data, updateData, onNext }: Props) => {
                 password: data.password,
             });
             if (res.success) {
-                updateData({ userId: (res.data as any)?.id });
+                updateData({ userId: (res.data as any)?.user_id });
                 toast({ title: 'Account created!', description: 'A verification email has been sent.' });
                 onNext();
             } else {

@@ -32,6 +32,11 @@ export const productService = {
     const response = await api.post('/products', product);
     return response.data;
   },
+    async uploadImage(file: FormData): Promise<ApiResponse> {
+    const response = await api.post(`/uploads/images`, file, { headers: { 'Content-Type': 'multipart/form-data' }});
+    return response.data;
+  },
+
 
   // Admin: Update product
   async updateProduct(id: string, product: Partial<Product>): Promise<Product> {

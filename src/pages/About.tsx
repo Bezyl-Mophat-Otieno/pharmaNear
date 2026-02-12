@@ -6,7 +6,7 @@ const About = () => {
     {
       icon: <Leaf className="h-8 w-8" />,
       title: 'Technology',
-      description: 'We provide cutting-edge digital solutions to help small businesses thrive in the online marketplace.'
+      description: 'We provide cutting-edge digital solutions to help small sellers thrive in the online marketplace.'
     },
     {
       icon: <Users className="h-8 w-8" />,
@@ -21,7 +21,7 @@ const About = () => {
     {
       icon: <Target className="h-8 w-8" />,
       title: 'Growth',
-      description: 'We focus on helping SMEs scale their businesses through technology and digital presence.'
+      description: 'We focus on helping SMEs scale their sellers through technology and digital presence.'
     }
   ];
 
@@ -45,18 +45,18 @@ const About = () => {
               Our Mission
             </h2>
             <p className="text-muted-foreground text-lg">
-              To provide small and medium enterprises with an intuitive, technology-enabled platform 
-              that simplifies online business management, from customer engagement to order fulfillment 
+              To provide small and medium enterprises with an intuitive, technology-enabled platform
+              that simplifies online business management, from customer engagement to order fulfillment
               and sales tracking.
             </p>
           </div>
-          
+
           <div className="bg-bee-gold/10 p-8 rounded-lg">
             <h2 className="text-2xl font-playfair font-bold mb-4 text-bee-gold">
               Our Vision
             </h2>
             <p className="text-muted-foreground text-lg">
-              To be Kenya's leading digital commerce platform, enabling every small business 
+              To be Kenya's leading digital commerce platform, enabling every small business
               to establish a strong online presence and compete effectively in the digital marketplace.
             </p>
           </div>
@@ -69,19 +69,19 @@ const About = () => {
           </h2>
           <div className="max-w-4xl mx-auto text-lg text-muted-foreground space-y-6">
             <p>
-              Shamsy was founded with a vision to bridge the digital divide for small and medium 
-              enterprises across Kenya. We recognized that many talented entrepreneurs lacked 
+              Shamsy was founded with a vision to bridge the digital divide for small and medium
+              enterprises across Kenya. We recognized that many talented entrepreneurs lacked
               the technical resources to establish an effective online presence.
             </p>
             <p>
-              Today, we're proud to serve hundreds of SMEs across various industries - from fashion 
-              designers and bakers to home decor artisans. Our platform provides everything needed 
-              to run a successful online business: inventory management, customer relationship tools, 
+              Today, we're proud to serve hundreds of SMEs across various industries - from fashion
+              designers and bakers to home decor artisans. Our platform provides everything needed
+              to run a successful online business: inventory management, customer relationship tools,
               order processing, and sales analytics.
             </p>
             <p>
-              Every business on Shamsy represents entrepreneurial spirit and innovation. When you 
-              shop with our merchants, you're not just buying a product — you're supporting 
+              Every business on Shamsy represents entrepreneurial spirit and innovation. When you
+              shop with our merchants, you're not just buying a product — you're supporting
               digital transformation and economic growth in Kenya's SME sector.
             </p>
           </div>

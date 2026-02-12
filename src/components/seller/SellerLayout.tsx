@@ -1,6 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { TenantSidebar } from "./TenantSidebar"
-import { TenantAuthGuard } from "./TenantAuthGuard"
+import { SellerSidebar } from "./SellerSidebar"
+import { SellerAuthGuard } from "./SellerAuthGuard"
 import { Button } from "@/components/ui/button"
 import { HomeIcon, LogOut, User } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
@@ -8,18 +8,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Link } from "react-router-dom"
 
-interface TenantLayoutProps {
+interface sellerLayoutProps {
   children: React.ReactNode
 }
 
-export function TenantLayout({ children }: TenantLayoutProps) {
+export function SellerLayout({ children }: sellerLayoutProps) {
   const { user, signOut } = useAuth()
 
   return (
-    <TenantAuthGuard>
+    <SellerAuthGuard>
       <SidebarProvider>
         <div className="min-h-screen flex w-full">
-          <TenantSidebar />
+          <SellerSidebar />
 
           <div className="flex-1 flex flex-col">
             <header className="h-14 flex items-center justify-between border-b border-border bg-background px-4">
@@ -77,6 +77,6 @@ export function TenantLayout({ children }: TenantLayoutProps) {
           </div>
         </div>
       </SidebarProvider>
-    </TenantAuthGuard>
+    </SellerAuthGuard>
   )
 }

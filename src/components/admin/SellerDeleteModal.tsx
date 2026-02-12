@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button';
 import { AlertTriangle } from 'lucide-react';
 
-interface BusinessDeleteModalProps {
+interface SellerDeleteModalProps {
     businessName: string;
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -10,13 +10,13 @@ interface BusinessDeleteModalProps {
     loading?: boolean;
 }
 
-export function BusinessDeleteModal({
+export function SellerDeleteModal({
     businessName,
     open,
     onOpenChange,
     onConfirm,
     loading,
-}: BusinessDeleteModalProps) {
+}: SellerDeleteModalProps) {
     return (
         <Dialog open={open} onOpenChange={loading ? undefined : onOpenChange}>
             <DialogContent className="max-w-md">

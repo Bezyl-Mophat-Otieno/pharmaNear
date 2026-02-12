@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, ArrowRight, Building2, MapPin, Info } from 'lucide-react';
-import { OnboardingData } from '@/pages/tenant/TenantOnboarding';
+import { OnboardingData } from '@/pages/seller/SellerOnboarding'
 interface Props {
     data: OnboardingData;
     updateData: (d: Partial<OnboardingData>) => void;

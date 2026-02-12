@@ -18,5 +18,5 @@ export interface  UploadedItem  {
 export const RoleEnum = {
   ADMIN: 'admin',
   CUSTOMER: 'customer',
-  TENANT: 'tenant',
+  SELLER: 'seller',
 }

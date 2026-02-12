@@ -31,7 +31,7 @@ const STEPS = [
     { label: 'Documents', description: 'Upload documents' },
     { label: 'Review', description: 'Review & submit' },
 ];
-const TenantOnboarding = () => {
+const SellerOnboarding = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [data, setData] = useState<OnboardingData>({
         firstName: '',
@@ -78,10 +78,10 @@ const TenantOnboarding = () => {
                                 onClick={() => goToStep(i)}
                                 disabled={i >= currentStep}
                                 className={`text-xs font-medium transition-colors ${i === currentStep
-                                        ? 'text-primary'
-                                        : i < currentStep
-                                            ? 'text-primary/60 cursor-pointer hover:text-primary'
-                                            : 'text-muted-foreground'
+                                    ? 'text-primary'
+                                    : i < currentStep
+                                        ? 'text-primary/60 cursor-pointer hover:text-primary'
+                                        : 'text-muted-foreground'
                                     }`}
                             >
                                 <Badge
@@ -121,4 +121,4 @@ const TenantOnboarding = () => {
         </div>
     );
 };
-export default TenantOnboarding;
+export default SellerOnboarding;

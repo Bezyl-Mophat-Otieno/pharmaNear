@@ -26,17 +26,17 @@ import {
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 
-const tenantMenuItems = [
-  { title: "Dashboard", url: "/tenant", icon: LayoutDashboard },
-  { title: "Product Management", url: "/tenant/products", icon: Package },
-  { title: "Category Management", url: "/tenant/categories", icon: FolderTree },
-  { title: "Orders", url: "/tenant/orders", icon: ShoppingCart },
-  { title: "Stock Management", url: "/tenant/stock", icon: Boxes },
-  { title: "Transactions", url: "/tenant/transactions", icon: CreditCard },
-  { title: "Profile", url: "/tenant/profile", icon: Settings },
+const sellerMenuItems = [
+  { title: "Dashboard", url: "/seller", icon: LayoutDashboard },
+  { title: "Product Management", url: "/seller/products", icon: Package },
+  { title: "Category Management", url: "/seller/categories", icon: FolderTree },
+  { title: "Orders", url: "/seller/orders", icon: ShoppingCart },
+  { title: "Stock Management", url: "/seller/stock", icon: Boxes },
+  { title: "Transactions", url: "/seller/transactions", icon: CreditCard },
+  { title: "Profile", url: "/seller/profile", icon: Settings },
 ]
 
-export function TenantSidebar() {
+export function SellerSidebar() {
   const { state } = useSidebar()
   const location = useLocation()
   const { signOut, user } = useAuth()
@@ -61,7 +61,7 @@ export function TenantSidebar() {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {tenantMenuItems.map((item) => (
+              {sellerMenuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink

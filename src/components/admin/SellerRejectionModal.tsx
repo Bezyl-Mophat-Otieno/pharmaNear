@@ -4,23 +4,23 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Business } from '@/services/businessService';
 import { AlertTriangle, FileText } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Seller } from '@/services/sellerService';
 
-interface BusinessRejectionModalProps {
-    business: Business;
+interface SellerRejectionModalProps {
+    seller: Seller;
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onConfirm: (reason: string, rejectedDocumentIds: string[]) => Promise<void>;
 }
 
-export function BusinessRejectionModal({
-    business,
+export function SellerRejectionModal({
+    seller,
     open,
     onOpenChange,
     onConfirm,
-}: BusinessRejectionModalProps) {
+}: SellerRejectionModalProps) {
     const [checkedDocs, setCheckedDocs] = useState<Set<string>>(new Set());
     const [reason, setReason] = useState('');
     const [submitting, setSubmitting] = useState(false);
@@ -57,18 +57,18 @@ export function BusinessRejectionModal({
                         Reject Business
                     </DialogTitle>
                     <DialogDescription>
-                        Please specify the reason for rejecting <strong>{business.businessName}</strong> and select the documents that are non-compliant.
+                        Please specify the reason for rejecting <strong>{seller.businessName}</strong> and select the documents that are non-compliant.
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-4 py-4">
                     <div className="space-y-2">
                         <p className="text-sm font-medium">Select non-compliant documents (at least one):</p>
-                        {business.documents.length === 0 ? (
+                        {seller.documents.length === 0 ? (
                             <p className="text-sm text-muted-foreground py-4 text-center">No documents submitted</p>
                         ) : (
                             <div className="space-y-3">
-                                {business.documents.map((doc) => (
+                                    {seller.documents.map((doc) => (
                                     <label
                                         key={doc.id}
                                         className="flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors"

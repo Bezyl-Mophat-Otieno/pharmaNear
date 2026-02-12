@@ -27,7 +27,7 @@ import { AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tool
 import { useMemo } from 'react'
 
 
-export default function AdminDashboard() {
+export default function SellerDashboard() {
     const { products, loading: productsLoading } = useAdminProducts();
     const { orders, loading: ordersLoading } = useAdminOrders();
     const { stats, loading: transactionsLoading } = useAdminTransactions();
