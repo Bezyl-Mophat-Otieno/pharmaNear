@@ -14,6 +14,7 @@ export interface OnboardingData {
     email: string;
     password: string;
     userId?: string;
+    businessId?: string;
     businessName: string;
     businessType: string;
     address: string;

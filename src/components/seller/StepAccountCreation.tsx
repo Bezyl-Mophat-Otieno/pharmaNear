@@ -33,7 +33,7 @@ const StepAccountCreation = ({ data, updateData, onNext }: Props) => {
         if (!validate()) return;
         setLoading(true);
         try {
-            const res = await sellerService.register({
+            const res = await sellerService.registerSeller({
                 firstName: data.firstName,
                 lastName: data.lastName,
                 email: data.email,

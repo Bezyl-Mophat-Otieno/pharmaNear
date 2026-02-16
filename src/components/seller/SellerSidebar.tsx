@@ -51,7 +51,7 @@ export function SellerSidebar() {
       <SidebarHeader className="border-b border-border">
         {!collapsed && (
           <div className="p-4">
-            <h2 className="text-lg font-semibold text-primary">Shamsy Admin</h2>
+            <h2 className="text-lg font-semibold text-primary">{user.role === "seller" ? "Business Admin" : "Admin"}</h2>
           </div>
         )}
       </SidebarHeader>
