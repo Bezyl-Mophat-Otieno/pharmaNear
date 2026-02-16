@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button"
 
 const adminMenuItems = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
-  { title: "Business Management", url: "/admin/sellers", icon: Building2 },
+  { title: "Business Management", url: "/admin/business-management", icon: Building2 },
   { title: "Profile", url: "/admin/profile", icon: Settings },
 ]
 
@@ -54,7 +54,7 @@ export function AdminSidebar() {
       <SidebarHeader className="border-b border-border">
         {!collapsed && (
           <div className="p-4">
-            <h2 className="text-lg font-semibold text-primary">Shamsy Admin</h2>
+            <h2 className="text-lg font-semibold text-primary">{user.role === "seller" ? "PharmNear Business Admin" : "Admin"}</h2>
           </div>
         )}
       </SidebarHeader>

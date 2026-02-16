@@ -6,7 +6,6 @@ export const API_BASE_URL = import.meta.env.VITE_PUBLIC_BEEQ_API_URL
 // Create axios instance
 export const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
   withCredentials: true,
 });
 

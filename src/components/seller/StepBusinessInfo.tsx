@@ -8,6 +8,8 @@ import { ArrowLeft, ArrowRight, Building2, MapPin, Info, Loader2 } from 'lucide-
 import { OnboardingData } from '@/pages/seller/SellerOnboarding';
 import geocodingService from '@/services/geocoding';
 import type { Location } from '@/types/geocoding';
+import { sellerService } from '@/services/sellerService';
+import { useToast } from '@/hooks/use-toast';
 interface Props {
     data: OnboardingData;
     updateData: (d: Partial<OnboardingData>) => void;
@@ -27,10 +29,12 @@ const StepBusinessInfo = ({ data, updateData, onNext, onBack }: Props) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [suggestions, setSuggestions] = useState<Location[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [processingSellerAccount, setProcessingSellerAccount] = useState<boolean>(false)
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
     const debounceTimer = useRef<NodeJS.Timeout>();
     const suggestionsRef = useRef<HTMLDivElement>(null);
+    const { toast } = useToast();
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -95,12 +99,37 @@ const StepBusinessInfo = ({ data, updateData, onNext, onBack }: Props) => {
         const errs: Record<string, string> = {};
         if (!data.businessName.trim()) errs.businessName = 'Business name is required';
         if (!data.address.trim()) errs.address = 'Location is required';
+        if (!data.latitude || !data.longitude) errs.address = 'Please select a valid location from the suggestions'
+        if (!data.userId) errs.userId = 'User ID is required'
         setErrors(errs);
         return Object.keys(errs).length === 0;
     };
 
-    const handleNext = () => {
-        if (validate()) onNext();
+
+    const handleNext = async () => {
+        if (!validate()) return;
+        setProcessingSellerAccount(true);
+        try {
+            const res = await sellerService.registerSellersBusiness({
+                businessName: data.businessName,
+                address: data.address,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                businessType: data.businessType
+            }, data.userId);
+            if (res.success) {
+                toast({ title: `Seller's Business Account Created`, description: 'Your seller business account has been created successfully.' });
+                updateData({ businessId: (res.data as any).business_id })
+
+                onNext();
+            } else {
+                toast({ title: `Seller's Business Registration failed`, description: res.message, variant: 'destructive' });
+            }
+        } catch {
+            // error handled by interceptor
+        } finally {
+            setProcessingSellerAccount(false);
+        }
     };
     return (
         <Card>
@@ -217,9 +246,14 @@ const StepBusinessInfo = ({ data, updateData, onNext, onBack }: Props) => {
                         <ArrowLeft className="h-4 w-4 mr-1" /> Back
                     </Button>
                     <Button onClick={handleNext}>
-                        Continue <ArrowRight className="ml-2 h-4 w-4" />
+                        {processingSellerAccount ? (
+                            <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Creating Seller Account...</>
+                        ) : (
+                            <>Continue <ArrowRight className="ml-2 h-4 w-4" /></>
+                        )}
                     </Button>
                 </div>
+
             </CardContent>
         </Card>
     );

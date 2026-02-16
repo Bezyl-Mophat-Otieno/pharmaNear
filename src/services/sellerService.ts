@@ -48,7 +48,7 @@ export interface SellerStats {
   rejected: number;
 }
 export const sellerService = {
-  async register(data: SellerRegistrationData): Promise<ApiResponse> {
+  async registerSeller(data: SellerRegistrationData): Promise<ApiResponse> {
     const response = await api.post('/auth/register?role=seller', {
       name: `${data.firstName} ${data.lastName}`,
       email: data.email,
@@ -56,6 +56,7 @@ export const sellerService = {
     });
     return response.data;
   },
+
   async verifyEmail(email: string, token: string): Promise<ApiResponse> {
     const response = await api.post('/auth/verify-email', { email, token });
     return response.data;
@@ -64,8 +65,8 @@ export const sellerService = {
     const response = await api.post('/auth/resend-verification', { email });
     return response.data;
   },
-  async submitSeller(data: SellerData): Promise<ApiResponse> {
-    const response = await api.post('/sellers', data);
+  async registerSellersBusiness(data: SellerData, userId: string): Promise<ApiResponse> {
+    const response = await api.post(`/sellers?userId=${userId}`, data);
     return response.data;
   },
   async uploadDocument(file: FormData, type: 'ppb_license' | 'business_permit', userId: string): Promise<ApiResponse> {
@@ -91,11 +92,11 @@ export const sellerService = {
       page?: number;
       limit?: number;
     }): Promise<{ data: Seller[]; stats: SellerStats; total: number }> {
-      const response = await api.get('/admin/sellers', { params });
+      const response = await api.get('/sellers/admin', { params });
       return response.data;
     },
     async getSeller(id: string): Promise<Seller> {
-      const response = await api.get(`/admin/sellers/${id}`);
+      const response = await api.get(`/sellers/${id}`);
       return response.data.data;
     },
     async updateSeller(id: string, data: Partial<Seller>): Promise<Seller> {
