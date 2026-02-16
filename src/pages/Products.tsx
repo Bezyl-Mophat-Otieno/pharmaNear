@@ -40,7 +40,6 @@ const Products = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="p-6 h-96 flex items-center justify-center">
-          <LoadingSpinner size="lg" text="Loading products..." />
           <p className="text-muted-foreground">{error}</p>
         </div>
       </div>

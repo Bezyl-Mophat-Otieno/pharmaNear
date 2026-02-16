@@ -49,6 +49,12 @@ const GuestProductCard = ({ product, onAddToCart }: GuestProductCardProps) => {
                         {product.name}
                     </h3>
 
+                    {product.business_name && (
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                            <span className="font-medium">Sold by:</span> {product.business_name}
+                        </p>
+                    )}
+
                     {product.description && (
                         <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
                             {product.description}

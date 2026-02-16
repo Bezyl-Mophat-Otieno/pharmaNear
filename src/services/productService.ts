@@ -9,6 +9,11 @@ export const productService = {
     return response.data;
   },
 
+    async getAdminProducts(): Promise<ApiResponse> {
+    const response = await api.get('/products/admin');
+    return response.data;
+  },
+
   // Get product by ID
   async getProduct(id: string): Promise<Product> {
     const response = await api.get(`/products/${id}`);
