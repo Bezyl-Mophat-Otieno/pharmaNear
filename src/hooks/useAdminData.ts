@@ -22,7 +22,7 @@ export const useAdminProducts = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await productService.getProducts();
+      const response = await productService.getAdminProducts();
       const data = response.data as Product[];
       setProducts(data);
       setError(null);
