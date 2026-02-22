@@ -27,9 +27,9 @@ const Navbar = () => {
 
   const navLinks = [
     { path: '/', label: 'Home' },
-    { path: '/products', label: 'Products' },
-    { path: '/about', label: 'About' },
-    { path: '/contact', label: 'Contact Us' }
+    // { path: '/products', label: 'Products' },
+    // { path: '/about', label: 'About' },
+    // { path: '/contact', label: 'Contact Us' }
   ];
 
   const menuItems = [
@@ -81,43 +81,43 @@ const Navbar = () => {
             </Button>
 
             <CartIcon />
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="relative"
-                    aria-label="More options"
-                  >
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-48 p-0">
-                  <div className="py-2">
-                    {menuItems.map((item) => (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        className="flex items-center px-4 py-2 text-sm hover:bg-accent transition-colors"
-                      >
-                        <item.icon className="h-4 w-4 mr-3" />
-                        {item.label}
-                      </Link>
-                    ))}
-                    <div className="border-t my-1"></div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-              <div className="flex items-center gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="sm"
-                  onClick={() => setShowLoginModal(true)}
-                  className="hidden sm:flex text-xs"
+                  size="icon"
+                  className="relative"
+                  aria-label="More options"
                 >
-                  Admin
+                  <MoreVertical className="h-4 w-4" />
                 </Button>
-              </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-0">
+                <div className="py-2">
+                  {menuItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className="flex items-center px-4 py-2 text-sm hover:bg-accent transition-colors"
+                    >
+                      <item.icon className="h-4 w-4 mr-3" />
+                      {item.label}
+                    </Link>
+                  ))}
+                  <div className="border-t my-1"></div>
+                </div>
+              </PopoverContent>
+            </Popover>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowLoginModal(true)}
+                className="hidden sm:flex text-xs"
+              >
+                Admin
+              </Button>
+            </div>
             {/* Mobile menu button */}
             <Button
               variant="ghost"
