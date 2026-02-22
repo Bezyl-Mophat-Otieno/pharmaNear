@@ -7,6 +7,8 @@ import { ArrowLeft, Send, Loader2, User, Building2, FileText, CheckCircle2 } fro
 import { sellerService } from '@/services/sellerService';
 import { useToast } from '@/hooks/use-toast';
 import { OnboardingData } from '@/pages/seller/SellerOnboarding';
+import { useNavigate } from 'react-router-dom';
+
 interface Props {
     data: OnboardingData;
     onBack: () => void;
@@ -22,37 +24,7 @@ const Section = ({ icon: Icon, title, children }: { icon: any; title: string; ch
     </div>
 );
 const StepReviewSubmit = ({ data, onBack, onSubmit }: Props) => {
-    const { toast } = useToast();
-    const [loading, setLoading] = useState(false);
-    const handleSubmit = async () => {
-        setLoading(true);
-        try {
-            const res = await sellerService.submitOnboarding({
-                userId: data.userId || '',
-                seller: {
-                    businessName: data.businessName,
-                    businessType: data.businessType,
-                    address: data.address,
-                    latitude: data.latitude,
-                    longitude: data.longitude,
-                },
-                documents: {
-                    ppbLicense: data.ppbLicenseUrl,
-                    businessPermit: data.businessPermitUrl,
-                },
-            });
-            if (res.success) {
-                toast({ title: 'Submitted!', description: 'Your business registration is under review.' });
-                onSubmit();
-            } else {
-                toast({ title: 'Submission failed', description: res.message, variant: 'destructive' });
-            }
-        } catch {
-            // handled by interceptor
-        } finally {
-            setLoading(false);
-        }
-    };
+    const navigate = useNavigate()
     return (
         <Card>
             <CardHeader>
@@ -99,12 +71,8 @@ const StepReviewSubmit = ({ data, onBack, onSubmit }: Props) => {
                     <Button variant="ghost" onClick={onBack}>
                         <ArrowLeft className="h-4 w-4 mr-1" /> Back
                     </Button>
-                    <Button onClick={handleSubmit} disabled={loading} size="lg">
-                        {loading ? (
-                            <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Submitting...</>
-                        ) : (
-                            <><Send className="h-4 w-4 mr-2" /> Submit Business Registration</>
-                        )}
+                    <Button onClick={() => navigate("/admin/login")} size="lg">
+                            <><Send className="h-4 w-4 mr-2" /> Done </>
                     </Button>
                 </div>
             </CardContent>

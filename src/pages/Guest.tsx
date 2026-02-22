@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,20 +14,22 @@ import {
     Navigation,
     AlertCircle,
     Sparkles,
-    ArrowRight
+    ArrowRight,
+    Loader2,
+    Info
 } from 'lucide-react';
 import { useGuestSearch } from '@/hooks/useGuestSearch';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { Product } from '@/types/product';
 import SearchResultsDrawer from '@/components/guest/SearchResultsDrawer';
-import { useProducts } from '@/hooks/useProducts';
 import SellerCallout from '@/components/seller/SellerCallout';
+import geocodingService from '@/services/geocoding';
+import type { Location } from '@/types/geocoding';
 const Guest = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
     const { items, addItem } = useCart();
-    const [showLocationInput, setShowLocationInput] = useState(false);
     const {
         searchQuery,
         setSearchQuery,
@@ -36,7 +38,6 @@ const Guest = () => {
         isDrawerOpen,
         setIsDrawerOpen,
         recentSearches,
-        hasSearched,
         locationState,
         performSearch,
         requestLocation,
@@ -45,12 +46,138 @@ const Guest = () => {
         clearRecentSearch,
         clearAllRecentSearches,
     } = useGuestSearch();
-    // Show location input if permission denied and distance sorting enabled
+
+    // Location autocomplete state
+    const [locationSearchQuery, setLocationSearchQuery] = useState('');
+    const [locationSuggestions, setLocationSuggestions] = useState<Location[]>([]);
+    const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+    const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
+    const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+    const [isGettingCurrentLocation, setIsGettingCurrentLocation] = useState(false);
+    const debounceTimer = useRef<NodeJS.Timeout>();
+    const suggestionsRef = useRef<HTMLDivElement>(null);
+
+    // Close suggestions when clicking outside
     useEffect(() => {
-        if (locationState.permission === 'denied' && locationState.distanceSortingEnabled) {
-            setShowLocationInput(true);
+        const handleClickOutside = (event: MouseEvent) => {
+            if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)) {
+                setShowLocationSuggestions(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Geocoding search with debounce
+    useEffect(() => {
+        if (locationSearchQuery.trim().length < 2) {
+            setLocationSuggestions([]);
+            return;
         }
-    }, [locationState.permission, locationState.distanceSortingEnabled]);
+
+        if (debounceTimer.current) {
+            clearTimeout(debounceTimer.current);
+        }
+
+        debounceTimer.current = setTimeout(async () => {
+            setIsLoadingLocation(true);
+            try {
+                const response = await geocodingService.geocode(locationSearchQuery);
+                if (response.success) {
+                    setLocationSuggestions(response.data);
+                    setShowLocationSuggestions(true);
+                } else {
+                    setLocationSuggestions([]);
+                }
+            } catch (error) {
+                console.error('Geocoding error:', error);
+                setLocationSuggestions([]);
+            } finally {
+                setIsLoadingLocation(false);
+            }
+        }, 500);
+
+        return () => {
+            if (debounceTimer.current) {
+                clearTimeout(debounceTimer.current);
+            }
+        };
+    }, [locationSearchQuery]);
+    const handleLocationSelect = (location: Location) => {
+        const fullAddress = `${location.name}${location.state ? ', ' + location.state : ''}, ${location.country}`;
+        setSelectedLocation(location);
+        setLocationSearchQuery(fullAddress);
+        setManualAddress(fullAddress);
+        setShowLocationSuggestions(false);
+        setLocationSuggestions([]);
+
+        toast({
+            title: "Location set",
+            description: `Using ${location.name} for distance sorting.`,
+        });
+    };
+
+    const handleGetCurrentLocation = async () => {
+        setIsGettingCurrentLocation(true);
+        try {
+            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                });
+            });
+
+            const { latitude, longitude } = position.coords;
+
+            // Reverse geocode to get location name
+            const response = await fetch(
+                `${import.meta.env.VITE_OPEN_WEATHER_API_REVERSE_GEOCODE_URL}?lat=${latitude}&lon=${longitude}&limit=1&appid=${import.meta.env.VITE_OPEN_WEATHER_API_KEY}`
+            );
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data && data.length > 0) {
+                    const location = data[0];
+                    const fullAddress = `${location.name}${location.state ? ', ' + location.state : ''}, ${location.country}`;
+
+                    setSelectedLocation({
+                        name: location.name,
+                        country: location.country,
+                        state: location.state,
+                        lat: latitude,
+                        lon: longitude
+                    });
+                    setLocationSearchQuery(fullAddress);
+                    setManualAddress(fullAddress);
+
+                    toast({
+                        title: "Location detected",
+                        description: `Using your current location: ${location.name}`,
+                    });
+                } else {
+                    // Fallback: just use coordinates
+                    const coordsAddress = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+                    setManualAddress(coordsAddress);
+                    toast({
+                        title: "Location detected",
+                        description: "Using your current coordinates for distance sorting.",
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error getting location:', error);
+            toast({
+                title: "Location error",
+                description: "Could not get your current location. Please enter it manually.",
+                variant: "destructive"
+            });
+        } finally {
+            setIsGettingCurrentLocation(false);
+        }
+    };
+
     const handleSearch = (e: FormEvent) => {
         e.preventDefault();
         if (searchQuery.trim()) {
@@ -74,15 +201,7 @@ const Guest = () => {
         setIsDrawerOpen(false);
         navigate('/cart');
     };
-    const handleRequestLocation = async () => {
-        const granted = await requestLocation();
-        if (granted) {
-            toast({
-                title: "Location enabled",
-                description: "We'll show you products sorted by distance.",
-            });
-        }
-    };
+
     const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
@@ -137,75 +256,157 @@ const Guest = () => {
                         {/* Location Controls */}
                         <Card className="bg-background/80 backdrop-blur-sm border shadow-sm mb-8">
                             <CardContent className="p-4">
-                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                                    {/* Location Status */}
-                                    <div className="flex items-center gap-3 flex-1">
-                                        <div className={`h-10 w-10 rounded-full flex items-center justify-center ${locationState.permission === 'granted'
-                                            ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
-                                            : 'bg-muted text-muted-foreground'
-                                            }`}>
-                                            <MapPin className="h-5 w-5" />
+                                <div className="space-y-4">
+                                    {/* Location Status Header */}
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`h-10 w-10 rounded-full flex items-center justify-center ${locationState.permission === 'granted'
+                                                ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
+                                                : 'bg-muted text-muted-foreground'
+                                                }`}>
+                                                <MapPin className="h-5 w-5" />
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="text-sm font-medium">
+                                                    {locationState.permission === 'granted'
+                                                        ? 'Location enabled'
+                                                        : locationState.permission === 'denied'
+                                                            ? 'Location disabled'
+                                                            : 'Set your location'}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {locationState.distanceSortingEnabled
+                                                        ? 'For distance-based sorting'
+                                                        : 'Distance sorting is disabled'}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div className="text-left">
-                                            <p className="text-sm font-medium">
-                                                {locationState.permission === 'granted'
-                                                    ? 'Location enabled'
-                                                    : locationState.permission === 'denied'
-                                                        ? 'Location disabled'
-                                                        : 'Enable location'}
-                                            </p>
-                                            <p className="text-xs text-muted-foreground">
-                                                {locationState.permission === 'granted'
-                                                    ? 'Sorting by distance is active'
-                                                    : 'For distance-based sorting'}
-                                            </p>
+
+                                        <div className="flex items-center gap-2">
+                                            <Checkbox
+                                                id="disable-distance"
+                                                checked={!locationState.distanceSortingEnabled}
+                                                onCheckedChange={(checked) => toggleDistanceSorting(!checked)}
+                                            />
+                                            <Label htmlFor="disable-distance" className="text-xs text-muted-foreground cursor-pointer">
+                                                Skip distance sorting
+                                            </Label>
                                         </div>
                                     </div>
-                                    {/* Location Actions */}
-                                    {locationState.permission !== 'granted' && (
-                                        <div className="flex items-center gap-3 w-full sm:w-auto">
-                                            {locationState.permission === 'not-requested' && (
+
+                                    {/* Location Input Options - Always visible when distance sorting is enabled */}
+                                    {locationState.distanceSortingEnabled && (
+                                        <div className="space-y-4 pt-4 border-t">
+                                            {/* Option 1: Auto-detect location */}
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-medium flex items-center gap-2">
+                                                    <Navigation className="h-4 w-4" />
+                                                    Option 1: Auto-detect your location
+                                                </Label>
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={handleRequestLocation}
-                                                    className="flex-1 sm:flex-none"
+                                                    onClick={handleGetCurrentLocation}
+                                                    disabled={isGettingCurrentLocation}
+                                                    className="w-full sm:w-auto"
                                                 >
-                                                    <Navigation className="h-4 w-4 mr-2" />
-                                                    Enable
+                                                    {isGettingCurrentLocation ? (
+                                                        <>
+                                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                                            Getting location...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Navigation className="h-4 w-4 mr-2" />
+                                                            Use my current location
+                                                        </>
+                                                    )}
                                                 </Button>
-                                            )}
+                                            </div>
 
-                                            <div className="flex items-center gap-2">
-                                                <Checkbox
-                                                    id="disable-distance"
-                                                    checked={!locationState.distanceSortingEnabled}
-                                                    onCheckedChange={(checked) => toggleDistanceSorting(!checked)}
-                                                />
-                                                <Label htmlFor="disable-distance" className="text-xs text-muted-foreground cursor-pointer">
-                                                    Skip distance sorting
+                                            {/* Option 2: Manual location search with autocomplete */}
+                                            <div className="space-y-2 relative">
+                                                <Label htmlFor="manual-location" className="text-sm font-medium flex items-center gap-2">
+                                                    <MapPin className="h-4 w-4" />
+                                                    Option 2: Enter your location manually
                                                 </Label>
+                                                <div className="relative">
+                                                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                                    <Input
+                                                        id="manual-location"
+                                                        placeholder="Search for your location (e.g., Westlands, Nairobi)..."
+                                                        value={locationSearchQuery}
+                                                        onChange={(e) => {
+                                                            setLocationSearchQuery(e.target.value);
+                                                            if (!e.target.value.trim()) {
+                                                                setSelectedLocation(null);
+                                                                setManualAddress('');
+                                                            }
+                                                        }}
+                                                        onFocus={() => locationSuggestions.length > 0 && setShowLocationSuggestions(true)}
+                                                        className="pl-9 pr-9 text-sm"
+                                                    />
+                                                    {isLoadingLocation && (
+                                                        <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-muted-foreground" />
+                                                    )}
+                                                </div>
+
+                                                {/* Location Suggestions Dropdown */}
+                                                {showLocationSuggestions && locationSuggestions.length > 0 && (
+                                                    <div
+                                                        ref={suggestionsRef}
+                                                        className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg max-h-60 overflow-auto"
+                                                    >
+                                                        {locationSuggestions.map((location, index) => (
+                                                            <button
+                                                                key={index}
+                                                                type="button"
+                                                                onClick={() => handleLocationSelect(location)}
+                                                                className="w-full px-4 py-3 text-left hover:bg-accent transition-colors flex items-start gap-2 border-b last:border-b-0"
+                                                            >
+                                                                <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className="font-medium text-sm">{location.name}</div>
+                                                                    <div className="text-xs text-muted-foreground">
+                                                                        {location.state && `${location.state}, `}{location.country}
+                                                                    </div>
+                                                                    <div className="text-xs text-muted-foreground mt-0.5">
+                                                                        Lat: {location.lat.toFixed(4)}, Lon: {location.lon.toFixed(4)}
+                                                                    </div>
+                                                                </div>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                {/* Selected Location Display */}
+                                                {selectedLocation && (
+                                                    <div className="flex items-start gap-2 p-3 rounded-lg bg-primary/10 text-xs">
+                                                        <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0 text-primary" />
+                                                        <div>
+                                                            <div className="font-medium">Selected Location</div>
+                                                            <div className="text-muted-foreground mt-1">
+                                                                {selectedLocation.name}{selectedLocation.state && `, ${selectedLocation.state}`}, {selectedLocation.country}
+                                                            </div>
+                                                            <div className="text-muted-foreground mt-0.5">
+                                                                Coordinates: {selectedLocation.lat.toFixed(4)}, {selectedLocation.lon.toFixed(4)}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Info Text */}
+                                                <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/50 text-xs text-muted-foreground">
+                                                    <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                                                    <span>
+                                                        Start typing your city or location name to see suggestions.
+                                                        Select a location from the dropdown to enable distance-based sorting.
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     )}
                                 </div>
-                                {/* Manual Location Input */}
-                                {showLocationInput && locationState.distanceSortingEnabled && (
-                                    <div className="mt-4 pt-4 border-t">
-                                        <div className="flex items-start gap-2 mb-3">
-                                            <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5" />
-                                            <p className="text-xs text-muted-foreground">
-                                                Location access was denied. Please enter your location manually for distance sorting.
-                                            </p>
-                                        </div>
-                                        <Input
-                                            placeholder="Enter your area or address (e.g., Westlands, Nairobi)"
-                                            value={locationState.manualAddress}
-                                            onChange={(e) => setManualAddress(e.target.value)}
-                                            className="text-sm"
-                                        />
-                                    </div>
-                                )}
                             </CardContent>
                         </Card>
                         {/* Info Text */}

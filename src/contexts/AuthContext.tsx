@@ -27,7 +27,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const location = useLocation();
 
   // Check if current route is an admin route
-  const isAdminRoute = (location.pathname.startsWith('/admin') || location.pathname.startsWith('/seller')) && !location.pathname.endsWith('/login');
+  const isAdminRoute =
+    (location.pathname.startsWith('/admin') || location.pathname.startsWith('/seller')) &&
+    !(location.pathname.endsWith('/onboard') || location.pathname.endsWith('/login'));
 
 
   // Re-check auth when navigating to admin routes

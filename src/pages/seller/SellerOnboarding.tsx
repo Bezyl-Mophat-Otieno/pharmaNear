@@ -112,10 +112,10 @@ const SellerOnboarding = () => {
                 {currentStep === 2 && (
                     <StepBusinessInfo data={data} updateData={updateData} onNext={next} onBack={back} />
                 )}
-                {currentStep === 3 && (
+                {/* {currentStep === 3 && (
                     <StepDocumentUpload data={data} updateData={updateData} onNext={next} onBack={back} />
-                )}
-                {currentStep === 4 && (
+                )} Skip this for now due to issues with cloudinary */} 
+                {currentStep === 3 && (
                     <StepReviewSubmit data={data} onBack={back} onSubmit={next} />
                 )}
             </div>
