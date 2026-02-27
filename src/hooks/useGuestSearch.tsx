@@ -63,54 +63,7 @@ export const useGuestSearch = () => {
             return updated;
         });
     }, []);
-    // Request browser location
-    const requestLocation = useCallback(async (): Promise<boolean> => {
-        if (!navigator.geolocation) {
-            setLocationState(prev => ({
-                ...prev,
-                permission: 'denied',
-            }));
-            localStorage.setItem(LOCATION_PERMISSION_KEY, JSON.stringify({
-                permission: 'denied',
-                distanceSortingEnabled: locationState.distanceSortingEnabled,
-                manualAddress: locationState.manualAddress,
-            }));
-            return false;
-        }
-        return new Promise((resolve) => {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const newLocation = {
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                    };
-                    setLocationState(prev => ({
-                        ...prev,
-                        permission: 'granted',
-                        location: newLocation,
-                    }));
-                    localStorage.setItem(LOCATION_PERMISSION_KEY, JSON.stringify({
-                        permission: 'granted',
-                        distanceSortingEnabled: true,
-                        manualAddress: '',
-                    }));
-                    resolve(true);
-                },
-                () => {
-                    setLocationState(prev => ({
-                        ...prev,
-                        permission: 'denied',
-                    }));
-                    localStorage.setItem(LOCATION_PERMISSION_KEY, JSON.stringify({
-                        permission: 'denied',
-                        distanceSortingEnabled: locationState.distanceSortingEnabled,
-                        manualAddress: locationState.manualAddress,
-                    }));
-                    resolve(false);
-                }
-            );
-        });
-    }, [locationState.distanceSortingEnabled, locationState.manualAddress]);
+
     // Toggle distance sorting
     const toggleDistanceSorting = useCallback((enabled: boolean) => {
         setLocationState(prev => {
@@ -135,6 +88,25 @@ export const useGuestSearch = () => {
             return updated;
         });
     }, []);
+
+    // Set location coordinates
+    const setLocation = useCallback((location: GuestLocation | null) => {
+        setLocationState(prev => ({
+            ...prev,
+            location,
+            permission: location ? 'granted' : prev.permission,
+        }));
+    }, []);
+
+    // Check if search can be performed
+    const canSearch = useCallback(() => {
+        // If distance sorting is disabled, search is always allowed
+        if (!locationState.distanceSortingEnabled) {
+            return true;
+        }
+        // If distance sorting is enabled, location must be set
+        return locationState.location !== null;
+    }, [locationState.distanceSortingEnabled, locationState.location]);
     // Perform search
     const performSearch = useCallback(async (query: string) => {
         if (!query.trim()) return;
@@ -142,11 +114,15 @@ export const useGuestSearch = () => {
         setHasSearched(true);
         setIsDrawerOpen(true);
         try {
-            // Request location on first search if not yet requested
-            if (locationState.permission === 'not-requested') {
-                await requestLocation();
-            }
-            const response = await productService.searchProducts(query);
+            // Pass location data if distance sorting is enabled and location is available
+            const searchOptions = locationState.distanceSortingEnabled && locationState.location
+                ? {
+                    latitude: locationState.location.latitude,
+                    longitude: locationState.location.longitude,
+                }
+                : undefined;
+
+            const response = await productService.searchProducts(query, searchOptions);
             const products = (response.data as Product[]) || [];
 
             setSearchResults(products);
@@ -157,7 +133,7 @@ export const useGuestSearch = () => {
         } finally {
             setIsSearching(false);
         }
-    }, [locationState.permission, requestLocation, saveRecentSearch]);
+    }, [locationState.distanceSortingEnabled, locationState.location, saveRecentSearch]);
     // Clear recent search
     const clearRecentSearch = useCallback((query: string) => {
         setRecentSearches(prev => {
@@ -182,9 +158,10 @@ export const useGuestSearch = () => {
         hasSearched,
         locationState,
         performSearch,
-        requestLocation,
         toggleDistanceSorting,
         setManualAddress,
+        setLocation,
+        canSearch,
         clearRecentSearch,
         clearAllRecentSearches,
     };

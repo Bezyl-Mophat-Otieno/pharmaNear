@@ -40,9 +40,10 @@ const Guest = () => {
         recentSearches,
         locationState,
         performSearch,
-        requestLocation,
         toggleDistanceSorting,
         setManualAddress,
+        setLocation,
+        canSearch,
         clearRecentSearch,
         clearAllRecentSearches,
     } = useGuestSearch();
@@ -109,6 +110,14 @@ const Guest = () => {
         setSelectedLocation(location);
         setLocationSearchQuery(fullAddress);
         setManualAddress(fullAddress);
+
+        // Set the location coordinates in the hook
+        setLocation({
+            latitude: location.lat,
+            longitude: location.lon,
+            address: fullAddress,
+        });
+
         setShowLocationSuggestions(false);
         setLocationSuggestions([]);
 
@@ -152,6 +161,13 @@ const Guest = () => {
                     setLocationSearchQuery(fullAddress);
                     setManualAddress(fullAddress);
 
+                    // Set the location coordinates in the hook
+                    setLocation({
+                        latitude,
+                        longitude,
+                        address: fullAddress,
+                    });
+
                     toast({
                         title: "Location detected",
                         description: `Using your current location: ${location.name}`,
@@ -160,6 +176,14 @@ const Guest = () => {
                     // Fallback: just use coordinates
                     const coordsAddress = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
                     setManualAddress(coordsAddress);
+
+                    // Set the location coordinates in the hook
+                    setLocation({
+                        latitude,
+                        longitude,
+                        address: coordsAddress,
+                    });
+
                     toast({
                         title: "Location detected",
                         description: "Using your current coordinates for distance sorting.",
@@ -240,7 +264,7 @@ const Guest = () => {
                                     type="submit"
                                     size="lg"
                                     className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full px-6"
-                                    disabled={!searchQuery.trim() || isSearching}
+                                    disabled={!searchQuery.trim() || isSearching || !canSearch()}
                                 >
                                     {isSearching ? (
                                         <span className="animate-pulse">Searching...</span>
@@ -252,6 +276,16 @@ const Guest = () => {
                                     )}
                                 </Button>
                             </div>
+
+                            {/* Location Required Hint */}
+                            {searchQuery.trim() && !canSearch() && locationState.distanceSortingEnabled && (
+                                <div className="mt-3 flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                                    <AlertCircle className="h-4 w-4 mt-0.5 shrink-0 text-amber-600 dark:text-amber-500" />
+                                    <div className="text-sm text-amber-800 dark:text-amber-200">
+                                        <span className="font-medium">Location required:</span> Please set your location using one of the options below, or disable distance sorting to search without location.
+                                    </div>
+                                </div>
+                            )}
                         </form>
                         {/* Location Controls */}
                         <Card className="bg-background/80 backdrop-blur-sm border shadow-sm mb-8">
@@ -260,23 +294,27 @@ const Guest = () => {
                                     {/* Location Status Header */}
                                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                         <div className="flex items-center gap-3">
-                                            <div className={`h-10 w-10 rounded-full flex items-center justify-center ${locationState.permission === 'granted'
-                                                ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
-                                                : 'bg-muted text-muted-foreground'
+                                            <div className={`h-10 w-10 rounded-full flex items-center justify-center ${locationState.location
+                                                    ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
+                                                    : locationState.distanceSortingEnabled
+                                                        ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+                                                        : 'bg-muted text-muted-foreground'
                                                 }`}>
                                                 <MapPin className="h-5 w-5" />
                                             </div>
                                             <div className="text-left">
                                                 <p className="text-sm font-medium">
-                                                    {locationState.permission === 'granted'
-                                                        ? 'Location enabled'
-                                                        : locationState.permission === 'denied'
-                                                            ? 'Location disabled'
+                                                    {locationState.location
+                                                        ? 'Location set'
+                                                        : locationState.distanceSortingEnabled
+                                                            ? 'Location required'
                                                             : 'Set your location'}
                                                 </p>
                                                 <p className="text-xs text-muted-foreground">
                                                     {locationState.distanceSortingEnabled
-                                                        ? 'For distance-based sorting'
+                                                        ? locationState.location
+                                                            ? `${locationState.location.address || 'Ready for distance sorting'}`
+                                                            : 'Please set your location below'
                                                         : 'Distance sorting is disabled'}
                                                 </p>
                                             </div>
