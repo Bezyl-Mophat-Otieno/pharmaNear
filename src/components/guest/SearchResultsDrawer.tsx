@@ -3,8 +3,9 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
-import { X, Package, ShoppingCart, Loader2 } from 'lucide-react';
+import { X, Package, ShoppingCart, Loader2, Navigation } from 'lucide-react';
 import GuestProductCard from './GuestProductCard';
+
 interface SearchResultsDrawerProps {
     isOpen: boolean;
     onClose: () => void;
@@ -15,6 +16,7 @@ interface SearchResultsDrawerProps {
     cartItemCount: number;
     onViewCart: () => void;
 }
+
 const SearchResultsDrawer = ({
     isOpen,
     onClose,
@@ -25,6 +27,9 @@ const SearchResultsDrawer = ({
     cartItemCount,
     onViewCart,
 }: SearchResultsDrawerProps) => {
+    // Check if results have distance data
+    const hasDistanceData = results.length > 0 && results[0].distance_km !== undefined;
+
     return (
         <Sheet open={isOpen} onOpenChange={onClose}>
             <SheetContent
@@ -37,9 +42,17 @@ const SearchResultsDrawer = ({
                         <div>
                             <SheetTitle className="text-lg">Search Results</SheetTitle>
                             {searchQuery && !isLoading && (
-                                <p className="text-sm text-muted-foreground mt-0.5">
-                                    {results.length} result{results.length !== 1 ? 's' : ''} for "{searchQuery}"
-                                </p>
+                                <div className="space-y-1">
+                                    <p className="text-sm text-muted-foreground">
+                                        {results.length} result{results.length !== 1 ? 's' : ''} for "{searchQuery}"
+                                    </p>
+                                    {hasDistanceData && (
+                                        <div className="flex items-center gap-1 text-xs text-primary">
+                                            <Navigation className="h-3 w-3" />
+                                            <span>Sorted by distance</span>
+                                        </div>
+                                    )}
+                                </div>
                             )}
                         </div>
                         <Button variant="ghost" size="icon" onClick={onClose}>
@@ -47,6 +60,7 @@ const SearchResultsDrawer = ({
                         </Button>
                     </div>
                 </SheetHeader>
+
                 {/* Loading State */}
                 {isLoading && (
                     <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
@@ -60,6 +74,7 @@ const SearchResultsDrawer = ({
                         </div>
                     </div>
                 )}
+
                 {/* Results */}
                 {!isLoading && results.length > 0 && (
                     <ScrollArea className="flex-1">
@@ -74,6 +89,7 @@ const SearchResultsDrawer = ({
                         </div>
                     </ScrollArea>
                 )}
+
                 {/* Empty State */}
                 {!isLoading && results.length === 0 && searchQuery && (
                     <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8 text-center">
@@ -88,6 +104,7 @@ const SearchResultsDrawer = ({
                         </div>
                     </div>
                 )}
+
                 {/* Cart Footer */}
                 {cartItemCount > 0 && (
                     <div className="p-4 border-t flex-shrink-0 bg-background">
@@ -108,4 +125,5 @@ const SearchResultsDrawer = ({
         </Sheet>
     );
 };
+
 export default SearchResultsDrawer;
