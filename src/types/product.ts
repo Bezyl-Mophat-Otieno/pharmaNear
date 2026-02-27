@@ -23,7 +23,12 @@ export interface Product {
   care_instructions?: string,
   created_at?: string;
   updated_at?: string;
-  
+  // Business location fields
+  latitude?: number;
+  longitude?: number;
+  address?: string;
+  // Distance field (when user location is provided)
+  distance_km?: number;
 }
 
 export enum productStatus {

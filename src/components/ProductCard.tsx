@@ -7,13 +7,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ShoppingCart, Heart, Star } from 'lucide-react';
+import { ShoppingCart, Heart, Star, MapPin, Navigation } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductRatingModal from '@/components/ProductRatingModal';
+import LocationMapModal from '@/components/LocationMapModal';
 
 interface ProductCardProps {
   product: Product;
@@ -25,8 +26,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [showRatingModal, setShowRatingModal] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
 
   const isAvailable = product.status === productStatus.available && product.stock > 0
+  const hasLocation = product.latitude !== undefined && product.longitude !== undefined;
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -158,6 +161,18 @@ const ProductCard = ({ product }: ProductCardProps) => {
               <span className="ml-1">{product.business_name}</span>
             </p>
           )}
+          {/* Distance Badge */}
+          {product.distance_km !== undefined && (
+            <div className="flex items-center gap-1 mb-2">
+              <Navigation className="h-3.5 w-3.5 text-primary" />
+              <span className="text-xs font-medium text-primary">
+                {product.distance_km < 1
+                  ? `${(product.distance_km * 1000).toFixed(0)}m away`
+                  : `${product.distance_km.toFixed(2)} km away`
+                }
+              </span>
+            </div>
+          )}
           <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
             {product.description}
           </p>
@@ -182,30 +197,48 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
         </CardContent>
 
-        <CardFooter className="p-4 pt-0 space-y-2 space-x-2 flex items-center justify-center">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                className="w-full btn-primary"
-                disabled={!isAvailable}
-                onClick={handleAddToCart}
-              >
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                Add to Cart
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="z-50">
-              <p>Add {product.name} to your cart</p>
-            </TooltipContent>
-          </Tooltip>
-          <Button
-            variant="secondary"
-            className="w-full"
-            disabled={!isAvailable}
-            onClick={handleBuyNow}
-          >
-            Buy Now
-          </Button>
+        <CardFooter className="p-4 pt-0 space-y-2 flex-col">
+          <div className="w-full flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  className="flex-1 btn-primary"
+                  disabled={!isAvailable}
+                  onClick={handleAddToCart}
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Add to Cart
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="z-50">
+                <p>Add {product.name} to your cart</p>
+              </TooltipContent>
+            </Tooltip>
+            <Button
+              variant="secondary"
+              className="flex-1"
+              disabled={!isAvailable}
+              onClick={handleBuyNow}
+            >
+              Buy Now
+            </Button>
+          </div>
+
+          {/* View Location Button */}
+          {hasLocation && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowLocationModal(true);
+              }}
+            >
+              <MapPin className="h-4 w-4 mr-2" />
+              View Location
+            </Button>
+          )}
         </CardFooter>
       </Card>
 
@@ -213,6 +246,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
         product={product}
         isOpen={showRatingModal}
         onClose={() => setShowRatingModal(false)}
+      />
+
+      <LocationMapModal
+        isOpen={showLocationModal}
+        onClose={() => setShowLocationModal(false)}
+        businessName={product.business_name}
+        latitude={product.latitude}
+        longitude={product.longitude}
+        address={product.address}
+        distance={product.distance_km}
       />
     </TooltipProvider>
   );

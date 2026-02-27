@@ -13,6 +13,7 @@ import ProductRatingModal from '@/components/ProductRatingModal';
 import ProductReviews from '@/components/ProductReviews';
 import { productStatus } from '@/types/product';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import LocationMapModal from '@/components/LocationMapModal';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -21,10 +22,14 @@ const ProductDetail = () => {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { toast } = useToast();
 
+
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showRatingModal, setShowRatingModal] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
+
 
   const { product, loading, error } = useProduct(id || '')
+
 
   if (loading) {
     return (
@@ -254,6 +259,18 @@ const ProductDetail = () => {
                 >
                   <Heart className={`h-4 w-4 ${isInWishlist(product.product_id) ? 'fill-current' : ''}`} />
                 </Button>
+                {product.latitude && product.longitude && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowLocationModal(true);
+                    }}
+                  >
+                    <MapPin className={`h-4 w-4}`} />
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -263,6 +280,15 @@ const ProductDetail = () => {
           <ProductReviews productId={product.product_id} />
         </div>
       </div>
+      <LocationMapModal
+        isOpen={showLocationModal}
+        onClose={() => setShowLocationModal(false)}
+        businessName={product.business_name}
+        latitude={product.latitude}
+        longitude={product.longitude}
+        address={product.address}
+        distance={product.distance_km}
+      />
 
       <ProductRatingModal
         product={product}
