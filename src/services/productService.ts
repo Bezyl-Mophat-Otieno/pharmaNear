@@ -27,8 +27,17 @@ export const productService = {
   },
 
   // Search products
-  async searchProducts(query: string): Promise<ApiResponse> {
-    const response = await api.get(`/products/search?q=${query}`);
+  async searchProducts(
+    query: string, 
+    options?: { latitude?: number; longitude?: number }
+  ): Promise<ApiResponse> {
+    let url = `/products/search?search=${query}`;
+    
+    if (options?.latitude !== undefined && options?.longitude !== undefined) {
+      url += `&latitude=${options.latitude}&longitude=${options.longitude}`;
+    }
+    
+    const response = await api.get(url);
     return response.data;
   },
 

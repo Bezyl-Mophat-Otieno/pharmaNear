@@ -5,7 +5,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Badge } from '@/components/ui/badge';
 import { X, Package, ShoppingCart, Loader2 } from 'lucide-react';
 import GuestProductCard from './GuestProductCard';
-import ProductCard from '../ProductCard';
 interface SearchResultsDrawerProps {
     isOpen: boolean;
     onClose: () => void;

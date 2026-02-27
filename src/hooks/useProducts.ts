@@ -41,10 +41,13 @@ export const useProducts = () => {
     }
   };
 
-  const searchProducts = async (query: string) => {
+  const searchProducts = async (
+    query: string, 
+    options?: { latitude?: number; longitude?: number }
+  ) => {
     try {
       setLoading(true);
-      const response = await productService.searchProducts(query);
+      const response = await productService.searchProducts(query, options);
       const data = response.data  as Product[];
       setProducts(data);
       setError(null);
