@@ -29,8 +29,7 @@ const LocationMapModal = ({
     const appleMapsUrl = `http://maps.apple.com/?q=${latitude},${longitude}`;
     const wazeUrl = `https://waze.com/ul?ll=${latitude},${longitude}&navigate=yes`;
 
-    // OpenStreetMap embed URL
-    const osmEmbedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude - 0.01},${latitude - 0.01},${longitude + 0.01},${latitude + 0.01}&layer=mapnik&marker=${latitude},${longitude}`;
+    const googleMapsEmbedUrl = `https://www.google.com/maps?q=${latitude},${longitude}&output=embed&z=15`;
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -48,9 +47,11 @@ const LocationMapModal = ({
                         <iframe
                             width="100%"
                             height="100%"
-                            frameBorder="0"
-                            scrolling="no"
-                            src={osmEmbedUrl}
+                            style={{ border: 0 }}
+                            loading="lazy"
+                            allowFullScreen
+                            referrerPolicy="no-referrer-when-downgrade"
+                            src={googleMapsEmbedUrl}
                             title={`${businessName} location map`}
                         />
                     </div>
