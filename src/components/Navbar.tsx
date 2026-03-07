@@ -46,8 +46,8 @@ const Navbar = () => {
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden">
               <img
-                src="/images/logos/shamsy.png"
-                alt="Shamsy Logo"
+                src="/images/logos/pharmaNear.png"
+                alt="pharmaNear Logo"
                 className="w-full h-full object-fit"
               />
             </div>
