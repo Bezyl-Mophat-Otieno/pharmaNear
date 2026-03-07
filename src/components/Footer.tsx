@@ -19,7 +19,7 @@ const Footer = () => {
             <Link to="/" className="flex items-center space-x-2">
               <div className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden">
                 <img
-                  src="/images/logos/shamsy.png"
+                  src="/images/logos/pharmaNear.png"
                   alt="Shamsy Logo"
                   className="w-full h-full object-fit"
                 />

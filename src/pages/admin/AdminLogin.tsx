@@ -70,7 +70,7 @@ export default function AdminLogin() {
         <CardHeader className="text-center">
           <div className="w-24 h-24 rounded-full overflow-hidden">
             <img
-              src="/images/logos/shamsy.png"
+              src="/images/logos/pharmaNear.png"
               alt="Shamsy Logo"
               className="w-full h-full object-fit"
             />
