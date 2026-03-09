@@ -40,6 +40,7 @@ import SellerProfile from "./pages/seller/SellerProfile";
 import { SellerLayout } from "./components/seller/SellerLayout";
 import SellerDashboard from "./pages/seller/SellerDashboard";
 import SellerOnboarding from "./pages/seller/SellerOnboarding";
+import { PWAUpdatePrompt } from "./components/PWAUpdatePrompt";
 
 
 const queryClient = new QueryClient();
@@ -59,6 +60,7 @@ function AppContent() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <PWAUpdatePrompt />
       {(showPublicLayout && !isLandinpage) && <Navbar />}
       <main className="flex-1">
         <Routes>
