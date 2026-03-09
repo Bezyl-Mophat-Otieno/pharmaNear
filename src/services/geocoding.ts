@@ -10,6 +10,7 @@ interface JsonResponse<T> {
 
 const CACHE_KEY = 'geocode_cache';
 const TTL = 24 * 60 * 60 * 1000; // 24 hours
+const API_BASE_URL = import.meta.env.VITE_PUBLIC_BEEQ_API_URL;
 
 class GeocodingService {
   private getCache(): Record<string, { data: LocationList; expiresAt: number }> {
@@ -64,27 +65,29 @@ class GeocodingService {
         };
       }
 
-      // Fetch from API
-      const { data: response } = await axios.get<LocationList>(
-        `${import.meta.env.VITE_OPEN_WEATHER_API_GEOCODE_URL}?q=${normalizedInput}&limit=5&appid=${import.meta.env.VITE_OPEN_WEATHER_API_KEY}`
+      // Fetch from backend API
+      const { data: response } = await axios.get<JsonResponse<LocationList>>(
+        `${API_BASE_URL}geocoding/search`,
+        {
+          params: {
+            q: normalizedInput,
+            limit: 5
+          }
+        }
       );
 
-      const subset = response.map((g) => ({
-        name: g.name,
-        country: g.country,
-        state: g.state,
-        lat: g.lat,
-        lon: g.lon,
-      }));
+      if (response.success && response.data.length > 0) {
+        const parsed = GeocodeListSchema.parse(response.data);
+        this.cacheData(normalizedInput, parsed);
+        
+        return {
+          success: true,
+          message: `We successfully found locations matching "${searchParam}".`,
+          data: parsed,
+        };
+      }
 
-      const parsed = GeocodeListSchema.parse(subset);
-      this.cacheData(normalizedInput, parsed);
-
-      return {
-        success: true,
-        message: `We successfully found locations matching "${searchParam}".`,
-        data: parsed,
-      };
+      return response;
     } catch (error) {
       let userMessage =
         'An unexpected error occurred while searching for locations. Please try again later.';
@@ -94,6 +97,8 @@ class GeocodingService {
           userMessage = `No locations found for "${searchParam}".`;
         } else if (error.response?.status === 401) {
           userMessage = 'Invalid API key. Please check your configuration.';
+        } else if (error.response?.data?.message) {
+          userMessage = error.response.data.message;
         } else {
           userMessage = `Unable to fetch location information for "${searchParam}" at this time.`;
         }
