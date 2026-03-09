@@ -142,7 +142,7 @@ const Guest = () => {
 
             // Reverse geocode to get location name
             const response = await fetch(
-                `${import.meta.env.VITE_OPEN_WEATHER_API_REVERSE_GEOCODE_URL}?lat=${latitude}&lon=${longitude}&limit=1&appid=${import.meta.env.VITE_OPEN_WEATHER_API_KEY}`
+                `${import.meta.env.VITE_PUBLIC_BEEQ_API_URL}geocoding/reverse?lat=${latitude}&lon=${longitude}&limit=1`
             );
 
             if (response.ok) {
@@ -295,10 +295,10 @@ const Guest = () => {
                                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                         <div className="flex items-center gap-3">
                                             <div className={`h-10 w-10 rounded-full flex items-center justify-center ${locationState.location
-                                                    ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
-                                                    : locationState.distanceSortingEnabled
-                                                        ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
-                                                        : 'bg-muted text-muted-foreground'
+                                                ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
+                                                : locationState.distanceSortingEnabled
+                                                    ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+                                                    : 'bg-muted text-muted-foreground'
                                                 }`}>
                                                 <MapPin className="h-5 w-5" />
                                             </div>
