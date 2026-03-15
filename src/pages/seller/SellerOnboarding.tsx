@@ -29,7 +29,7 @@ const STEPS = [
     { label: 'Account', description: 'Create your account' },
     { label: 'Verify', description: 'Verify your email' },
     { label: 'Business', description: 'Business details' },
-    { label: 'Documents', description: 'Upload documents' },
+    // { label: 'Documents', description: 'Upload documents' },
     { label: 'Review', description: 'Review & submit' },
 ];
 const SellerOnboarding = () => {
@@ -114,7 +114,7 @@ const SellerOnboarding = () => {
                 )}
                 {/* {currentStep === 3 && (
                     <StepDocumentUpload data={data} updateData={updateData} onNext={next} onBack={back} />
-                )} Skip this for now due to issues with cloudinary */} 
+                )} Skip this for now due to issues with cloudinary */}
                 {currentStep === 3 && (
                     <StepReviewSubmit data={data} onBack={back} onSubmit={next} />
                 )}
