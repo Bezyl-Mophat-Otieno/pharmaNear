@@ -8,12 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/contexts/AuthContext"
 import { authService, User } from "@/services/authService"
+import { ForgotPasswordModal } from "@/components/ForgotPasswordModal"
 
 export default function AdminLogin() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [showForgotPassword, setShowForgotPassword] = useState(false)
     const { toast } = useToast()
     const { user, loading, signIn } = useAuth()
     const navigate = useNavigate()
@@ -124,9 +126,25 @@ export default function AdminLogin() {
                         <Button type="submit" className="w-full" disabled={isLoading}>
                             {isLoading ? "Signing in..." : "Sign in"}
                         </Button>
+
+                        <div className="text-center">
+                            <button
+                                type="button"
+                                className="text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
+                                onClick={() => setShowForgotPassword(true)}
+                            >
+                                Forgot password?
+                            </button>
+                        </div>
                     </form>
                 </CardContent>
             </Card>
+
+            <ForgotPasswordModal
+                open={showForgotPassword}
+                onOpenChange={setShowForgotPassword}
+                onBack={() => setShowForgotPassword(false)}
+            />
         </div>
     )
 }

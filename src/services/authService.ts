@@ -46,6 +46,16 @@ export const authService = {
     return response.data;
   },
 
+  async forgotPassword(email: string): Promise<ApiResponse> {
+    const response = await api.post('/auth/forgot-password', { email });
+    return response.data;
+  },
+
+  async resetPasswordWithToken(token: string, password: string): Promise<ApiResponse> {
+    const response = await api.post('/auth/reset-password-token', { token, password });
+    return response.data;
+  },
+
   // Fetch all admins
   async fetchAllAdmins(): Promise<ApiResponse> {
     const response = await api.get(`/users?role=${RoleEnum.ADMIN}`);

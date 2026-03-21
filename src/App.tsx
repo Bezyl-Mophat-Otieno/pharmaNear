@@ -41,6 +41,7 @@ import { SellerLayout } from "./components/seller/SellerLayout";
 import SellerDashboard from "./pages/seller/SellerDashboard";
 import SellerOnboarding from "./pages/seller/SellerOnboarding";
 import { PWAUpdatePrompt } from "./components/PWAUpdatePrompt";
+import ResetPassword from "./pages/ResetPassword";
 
 
 const queryClient = new QueryClient();
@@ -81,6 +82,7 @@ function AppContent() {
 
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/admin" element={
             <AdminLayout>
               <SellerDashboard />
