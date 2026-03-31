@@ -185,7 +185,7 @@ const SearchResultsDrawer = ({
                                     ))}
                                 </SelectContent>
                             </Select>
-                            {/* Manufucturer */}
+                            {/* Manufuctarer */}
                             <Select
                                 value={filters.manufacturer ?? 'all'}
                                 onValueChange={v => handleFilterChange('manufacturer', v)}

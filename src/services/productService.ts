@@ -50,7 +50,7 @@ export const productService = {
     if (options?.requires_prescription !== undefined)
       params.set('requires_prescription', String(options.requires_prescription));
     if (options?.category_id)             params.set('category_id', options.category_id);
-    if (options?.manufacturer)            params.set('manufucturer', options.manufacturer);
+    if (options?.manufacturer)            params.set('manufacturer', options.manufacturer);
 
     const response = await api.get(`/products/search?${params.toString()}`);
     return response.data;
