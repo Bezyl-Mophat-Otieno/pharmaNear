@@ -73,7 +73,7 @@ const SearchResultsDrawer = ({
             else updated[key] = value;
         }
         onFiltersChange(updated);
-        onPageChange(1);
+        // onPageChange(1);
     };
 
     const clearFilters = () => {

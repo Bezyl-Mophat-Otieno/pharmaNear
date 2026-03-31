@@ -38,6 +38,7 @@ export const productService = {
       business_id?: string;
       requires_prescription?: boolean;
       category_id?: string;
+      manufacturer?: string
     }
   ): Promise<ApiResponse> {
     const params = new URLSearchParams({ search: query });
@@ -49,6 +50,7 @@ export const productService = {
     if (options?.requires_prescription !== undefined)
       params.set('requires_prescription', String(options.requires_prescription));
     if (options?.category_id)             params.set('category_id', options.category_id);
+    if (options?.manufacturer)            params.set('manufucturer', options.manufacturer);
 
     const response = await api.get(`/products/search?${params.toString()}`);
     return response.data;
