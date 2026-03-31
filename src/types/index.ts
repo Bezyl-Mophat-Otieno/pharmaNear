@@ -1,7 +1,10 @@
+import { ProductSearchPagination } from './product';
+
 export type ApiResponse = {
   success: boolean;
   message: string;
   data?: unknown;
+  pagination?: ProductSearchPagination;
 }
 
 

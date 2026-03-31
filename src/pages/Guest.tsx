@@ -16,7 +16,8 @@ import {
     Sparkles,
     ArrowRight,
     Loader2,
-    Info
+    Info,
+    ShoppingCart
 } from 'lucide-react';
 import { useGuestSearch } from '@/hooks/useGuestSearch';
 import { useCart } from '@/contexts/CartContext';
@@ -46,6 +47,10 @@ const Guest = () => {
         canSearch,
         clearRecentSearch,
         clearAllRecentSearches,
+        filters,
+        updateFilters,
+        pagination,
+        currentPage,
     } = useGuestSearch();
 
     // Location autocomplete state
@@ -547,10 +552,30 @@ const Guest = () => {
                 results={searchResults}
                 isLoading={isSearching}
                 searchQuery={searchQuery}
+                pagination={pagination}
+                currentPage={currentPage}
+                filters={filters}
+                onFiltersChange={(newFilters) => {
+                    updateFilters(newFilters);
+                    performSearch(searchQuery, 1, newFilters);
+                }}
+                onPageChange={(page) => performSearch(searchQuery, page)}
                 onAddToCart={handleAddToCart}
                 cartItemCount={cartItemCount}
                 onViewCart={handleViewCart}
             />
+
+            {/* Floating Cart Button — always visible */}
+            {cartItemCount > 0 && (
+                <button
+                    onClick={handleViewCart}
+                    className="fixed bottom-6 right-6 z-[100] flex items-center gap-2 bg-primary text-primary-foreground px-4 py-3 rounded-full shadow-xl hover:bg-primary/90 transition-all active:scale-95"
+                    aria-label="View cart"
+                >
+                    <ShoppingCart className="h-5 w-5" />
+                    <span className="font-semibold text-sm">{cartItemCount > 99 ? '99+' : cartItemCount}</span>
+                </button>
+            )}
         </div>
     );
 };

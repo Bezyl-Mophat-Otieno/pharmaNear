@@ -28,16 +28,29 @@ export const productService = {
 
   // Search products
   async searchProducts(
-    query: string, 
-    options?: { latitude?: number; longitude?: number }
-  ): Promise<ApiResponse> {
-    let url = `/products/search?search=${query}`;
-    
-    if (options?.latitude !== undefined && options?.longitude !== undefined) {
-      url += `&latitude=${options.latitude}&longitude=${options.longitude}`;
+    query: string,
+    options?: {
+      latitude?: number;
+      longitude?: number;
+      page?: number;
+      limit?: number;
+      // secondary filters
+      business_id?: string;
+      requires_prescription?: boolean;
+      category_id?: string;
     }
-    
-    const response = await api.get(url);
+  ): Promise<ApiResponse> {
+    const params = new URLSearchParams({ search: query });
+    if (options?.latitude  !== undefined) params.set('latitude',  String(options.latitude));
+    if (options?.longitude !== undefined) params.set('longitude', String(options.longitude));
+    if (options?.page      !== undefined) params.set('page',      String(options.page));
+    if (options?.limit     !== undefined) params.set('limit',     String(options.limit));
+    if (options?.business_id)             params.set('business_id', options.business_id);
+    if (options?.requires_prescription !== undefined)
+      params.set('requires_prescription', String(options.requires_prescription));
+    if (options?.category_id)             params.set('category_id', options.category_id);
+
+    const response = await api.get(`/products/search?${params.toString()}`);
     return response.data;
   },
 
