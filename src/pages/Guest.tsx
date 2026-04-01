@@ -251,7 +251,7 @@ const Guest = () => {
                                 Find What You Need
                             </h1>
                             <p className="text-lg text-muted-foreground">
-                                Search for products and place orders without creating an account
+                                Search for a drug or medical supplies and place orders without creating an account
                             </p>
                         </div>
                         {/* Search Form */}
