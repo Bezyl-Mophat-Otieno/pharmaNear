@@ -49,6 +49,7 @@ import { useAdminTransactions } from '@/hooks/useAdminData';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Order } from '@/types/order';
 import { FinancialSummary, Transaction } from '@/types/transaction';
+import { DataPagination } from '@/components/ui/data-pagination';
 
 export default function TransactionManagement() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -62,7 +63,8 @@ export default function TransactionManagement() {
     stats: financialSummary,
     loading,
     error,
-    refetch
+    refetch,
+    page, totalPages, total, pageSize, goToPage,
   } = useAdminTransactions();
 
 
@@ -480,6 +482,7 @@ export default function TransactionManagement() {
               </TableBody>
             </Table>
           </div>
+          <DataPagination page={page} totalPages={totalPages} total={total} limit={pageSize} onPageChange={goToPage} />
         </CardContent>
       </Card>
     </div>

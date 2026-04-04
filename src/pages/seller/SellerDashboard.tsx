@@ -3,7 +3,12 @@ import {
     Package,
     TrendingUp,
     ArrowUpRight,
-    ArrowDownRight
+    ArrowDownRight,
+    Share2,
+    Copy,
+    Check,
+    ExternalLink,
+    Store,
 } from "lucide-react"
 import {
     Card,
@@ -21,10 +26,14 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { useAdminProducts, useAdminOrders, useAdminTransactions, useAdminCategories } from "@/hooks/useAdminData"
 import { AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
+import { useAuth } from "@/contexts/AuthContext"
+import api from "@/lib/api"
 
 
 export default function SellerDashboard() {
@@ -32,6 +41,31 @@ export default function SellerDashboard() {
     const { orders, loading: ordersLoading } = useAdminOrders();
     const { stats, loading: transactionsLoading } = useAdminTransactions();
     const { categories, loading: categoriesLoading } = useAdminCategories();
+    const { user } = useAuth();
+
+    const [businessSlug, setBusinessSlug] = useState<string | null>(null);
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        if (!user?.user_id) return;
+        api.get(`/sellers/my-business`).then(res => {
+            const biz = res.data?.data;
+            if (biz?.business_name) {
+                setBusinessSlug(biz.business_name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
+            }
+        }).catch(() => { });
+    }, [user]);
+
+    const storefrontUrl = businessSlug
+        ? `${window.location.origin}/shop/${businessSlug}`
+        : null;
+
+    const handleCopy = () => {
+        if (!storefrontUrl) return;
+        navigator.clipboard.writeText(storefrontUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
 
     const loading = productsLoading || ordersLoading || transactionsLoading || categoriesLoading;
 
@@ -219,6 +253,52 @@ export default function SellerDashboard() {
                     )
                 })}
             </div>
+
+            {/* ── Share Your Store ── */}
+            {storefrontUrl && (
+                <Card className="border-2 border-primary/30 bg-primary/5">
+                    <CardHeader className="pb-3">
+                        <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <Share2 className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Store className="h-4 w-4" />
+                                    Your Store Link
+                                </CardTitle>
+                                <CardDescription>
+                                    Share this link with your customers so they can browse and order your products directly — no account needed on their end.
+                                </CardDescription>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex gap-2">
+                            <Input
+                                readOnly
+                                value={storefrontUrl}
+                                className="font-mono text-sm bg-background"
+                                onClick={e => (e.target as HTMLInputElement).select()}
+                            />
+                            <Button variant="outline" size="icon" onClick={handleCopy} className="shrink-0">
+                                {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                            </Button>
+                            <Button
+                                variant="default"
+                                size="icon"
+                                className="shrink-0"
+                                onClick={() => window.open(storefrontUrl, '_blank')}
+                            >
+                                <ExternalLink className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-2">
+                            Customers who open this link will see only your products, sorted by price. They can add items to cart and checkout without creating an account.
+                        </p>
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Charts Section */}
             <div className="grid gap-4 md:grid-cols-2">

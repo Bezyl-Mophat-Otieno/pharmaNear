@@ -14,17 +14,24 @@ export const useAdminProducts = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const PAGE_SIZE = 10;
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  useEffect(() => { fetchProducts(1); }, []);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (p = page) => {
     try {
       setLoading(true);
-      const response = await productService.getAdminProducts();
+      const response = await productService.getAdminProducts(p, PAGE_SIZE);
       const data = response.data as Product[];
       setProducts(data);
+      if (response.pagination) {
+        setTotalPages(response.pagination.totalPages);
+        setTotal(response.pagination.total);
+        setPage(response.pagination.page);
+      }
       setError(null);
     } catch (err) {
       setError('Failed to fetch products');
@@ -33,6 +40,8 @@ export const useAdminProducts = () => {
       setLoading(false);
     }
   };
+
+  const goToPage = (p: number) => fetchProducts(p);
 
   const createProduct = async (productData: Omit<Product, 'id'>) => {
     try {
@@ -94,7 +103,9 @@ export const useAdminProducts = () => {
     loading,
     deleting,
     error,
-    refetch: fetchProducts,
+    page, totalPages, total, pageSize: PAGE_SIZE,
+    goToPage,
+    refetch: () => fetchProducts(page),
     createProduct,
     updateProduct,
     deleteProduct,
@@ -107,16 +118,23 @@ export const useAdminOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const PAGE_SIZE = 10;
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+  useEffect(() => { fetchOrders(1); }, []);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (p = 1) => {
     try {
       setLoading(true);
-      const response = await orderService.getAllOrders();
+      const response = await orderService.getAllOrders(p, PAGE_SIZE);
       setOrders(response.data as Order[]);
+      if (response.pagination) {
+        setTotalPages(response.pagination.totalPages);
+        setTotal(response.pagination.total);
+        setPage(response.pagination.page);
+      }
       setError(null);
     } catch (err) {
       setError('Failed to fetch orders');
@@ -125,6 +143,8 @@ export const useAdminOrders = () => {
       setLoading(false);
     }
   };
+
+  const goToPage = (p: number) => fetchOrders(p);
 
   const updateOrderStatus = async (id: string, status: OrderStatus) => {
     try {
@@ -181,7 +201,9 @@ export const useAdminOrders = () => {
     orders,
     loading,
     error,
-    refetch: fetchOrders,
+    page, totalPages, total, pageSize: PAGE_SIZE,
+    goToPage,
+    refetch: () => fetchOrders(page),
     updateOrderStatus,
     updatePaymentStatus,
     cancelOrder,
@@ -193,6 +215,10 @@ export const useAdminTransactions = () => {
   const [stats, setStats] = useState<FinancialSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const PAGE_SIZE = 10;
 
   const fetchTransactions = async (filters?: {
     status?: string;
@@ -203,11 +229,16 @@ export const useAdminTransactions = () => {
   }) => {
     try {
       setLoading(true);
-      const response: ApiResponse = await transactionService.getTransactions(filters);
-
+      const p = filters?.page ?? 1;
+      const response: ApiResponse = await transactionService.getTransactions({ ...filters, page: p, limit: PAGE_SIZE });
       if (response.success && response.data) {
         setTransactions(response.data as Transaction[]);
-        return response.data 
+        if (response.pagination) {
+          setTotalPages(response.pagination.totalPages);
+          setTotal(response.pagination.total);
+          setPage(response.pagination.page);
+        }
+        return response.data;
       }
       throw new Error(response.message || 'Failed to fetch transactions');
     } catch (err) {
@@ -217,6 +248,8 @@ export const useAdminTransactions = () => {
       setLoading(false);
     }
   };
+
+  const goToPage = (p: number) => fetchTransactions({ page: p });
 
   const fetchTransactionStats = async () => {
     try {
@@ -319,6 +352,8 @@ export const useAdminTransactions = () => {
     stats,
     loading,
     error,
+    page, totalPages, total, pageSize: PAGE_SIZE,
+    goToPage,
     refetch: fetchTransactions,
     fetchTransactionStats,
     createTransaction,
@@ -336,6 +371,10 @@ export const useAdminStock = () => {
   const [stats, setStats] = useState<StockStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const PAGE_SIZE = 10;
 
   const fetchStockData = async (filters?: {
     search?: string;
@@ -346,8 +385,14 @@ export const useAdminStock = () => {
   }) => {
     try {
       setLoading(true);
-      const response = await stockService.getStockData(filters);
+      const p = filters?.page ?? 1;
+      const response = await stockService.getStockData({ ...filters, page: p, limit: PAGE_SIZE });
       setProducts(response.data as StockProduct[] || []);
+      if (response.pagination) {
+        setTotalPages(response.pagination.totalPages);
+        setTotal(response.pagination.total);
+        setPage(response.pagination.page);
+      }
       setError(null);
     } catch (err) {
       console.error('Error fetching stock data:', err);
@@ -356,6 +401,8 @@ export const useAdminStock = () => {
       setLoading(false);
     }
   };
+
+  const goToPage = (p: number) => fetchStockData({ page: p });
 
   const fetchStockStats = async () => {
     try {
@@ -451,6 +498,8 @@ try {
     stats,
     loading,
     error,
+    page, totalPages, total, pageSize: PAGE_SIZE,
+    goToPage,
     refetch: fetchStockData,
     fetchStockStats,
     getTopSellingProducts,

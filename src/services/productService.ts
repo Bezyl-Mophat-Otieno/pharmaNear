@@ -9,8 +9,8 @@ export const productService = {
     return response.data;
   },
 
-    async getAdminProducts(): Promise<ApiResponse> {
-    const response = await api.get('/products/admin');
+  async getAdminProducts(page = 1, limit = 10): Promise<ApiResponse> {
+    const response = await api.get(`/products/admin?page=${page}&limit=${limit}`);
     return response.data;
   },
 

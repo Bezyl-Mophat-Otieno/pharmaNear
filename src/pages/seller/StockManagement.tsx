@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAdminStock } from '@/hooks/useAdminData';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { StockProduct } from '@/services/stockService';
+import { DataPagination } from '@/components/ui/data-pagination';
 
 export default function StockManagement() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,6 +32,7 @@ export default function StockManagement() {
     refetch,
     topSellers,
     restockProduct,
+    page, totalPages, total, pageSize, goToPage,
   } = useAdminStock();
 
   // Filter products based on search and status
@@ -358,6 +360,7 @@ export default function StockManagement() {
               )}
             </TableBody>
           </Table>
+          <DataPagination page={page} totalPages={totalPages} total={total} limit={pageSize} onPageChange={goToPage} />
         </CardContent>
       </Card>
     </div>

@@ -27,8 +27,8 @@ export const orderService = {
   },
 
   // Admin: Get all orders
-  async getAllOrders(): Promise<ApiResponse> {
-    const response = await api.get('/orders');
+  async getAllOrders(page = 1, limit = 10): Promise<ApiResponse> {
+    const response = await api.get(`/orders?page=${page}&limit=${limit}`);
     return response.data;
   },
 

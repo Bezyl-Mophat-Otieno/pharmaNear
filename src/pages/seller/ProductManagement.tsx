@@ -41,6 +41,7 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Product, productStatus } from '@/types/product';
 import ProductForm from '@/components/admin/ProductForm';
 import ProductPreview from '@/components/admin/ProductPreview';
+import { DataPagination } from '@/components/ui/data-pagination';
 
 const ProductManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -64,7 +65,8 @@ const ProductManagement = () => {
     error: productsError,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    page, totalPages, total, pageSize, goToPage,
   } = useAdminProducts();
   const {
     categories,
@@ -415,6 +417,7 @@ const ProductManagement = () => {
               </TableBody>
             </Table>
           </div>
+          <DataPagination page={page} totalPages={totalPages} total={total} limit={pageSize} onPageChange={goToPage} />
         </CardContent>
       </Card>
 

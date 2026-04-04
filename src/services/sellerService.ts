@@ -118,4 +118,9 @@ export const sellerService = {
       const response = await api.post(`/admin/sellers/${id}/reject`, data);
       return response.data.data;
     },
+
+  async getStorefront(slug: string): Promise<ApiResponse> {
+    const response = await api.get(`/sellers/storefront/${slug}`);
+    return response.data;
+  },
 };

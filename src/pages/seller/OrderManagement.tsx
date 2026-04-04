@@ -15,6 +15,7 @@ import { Search, Download, Eye, Delete, Calendar, Package, CreditCard, Truck, Do
 import { downloadReceipt, OrderDetails } from '@/utils/receiptUtils';
 import AdminPaymentModal from '@/components/admin/AdminPaymentModal';
 import { Order, OrderStatus, PaymentStatus } from '@/types/order';
+import { DataPagination } from '@/components/ui/data-pagination';
 
 
 
@@ -34,7 +35,8 @@ const OrderManagement = () => {
     error,
     updateOrderStatus,
     cancelOrder,
-    updatePaymentStatus
+    updatePaymentStatus,
+    page, totalPages, total, pageSize, goToPage,
   } = useAdminOrders();
 
   // Filter orders based on search and filters
@@ -324,7 +326,7 @@ const OrderManagement = () => {
       {/* Orders Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Orders ({filteredOrders.length})</CardTitle>
+          <CardTitle>Orders ({total > 0 ? total : filteredOrders.length})</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -395,6 +397,7 @@ const OrderManagement = () => {
               ))}
             </TableBody>
           </Table>
+          <DataPagination page={page} totalPages={totalPages} total={total} limit={pageSize} onPageChange={goToPage} />
         </CardContent>
       </Card>
 
